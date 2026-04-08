@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Courtside Skeptic — AI NBA Betting Intel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06060e;
+    --bg2: #0d0d1c;
+    --bg3: #12122a;
+    --card: #0f0f20;
+    --card-border: #1e1e3f;
+    --cyan: #00e5ff;
+    --cyan-dim: rgba(0,229,255,0.12);
+    --green: #00ff87;
+    --gold: #ffd700;
+    --orange: #ff6b35;
+    --red: #ff3366;
+    --purple: #b44fff;
+    --gray: #3a3a5c;
+    --text: #e0e0ff;
+    --text-dim: #6b6b9a;
+    --font-head: 'Bebas Neue', sans-serif;
+    --font-data: 'Space Mono', monospace;
+    --font-ui: 'Rajdhani', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Grid background */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(0,229,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 20px 24px 0;
+    border-bottom: 1px solid var(--card-border);
+    background: linear-gradient(180deg, rgba(0,229,255,0.04) 0%, transparent 100%);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-bottom: 16px;
+  }
+  .logo-block { display: flex; align-items: baseline; gap: 10px; }
+  .logo-text {
+    font-family: var(--font-head);
+    font-size: clamp(28px, 5vw, 46px);
+    letter-spacing: 3px;
+    color: #fff;
+    text-shadow: 0 0 30px rgba(0,229,255,0.5);
+  }
+  .logo-badge {
+    font-family: var(--font-data);
+    font-size: 10px;
+    color: var(--cyan);
+    border: 1px solid var(--cyan);
+    padding: 2px 6px;
+    border-radius: 2px;
+    letter-spacing: 2px;
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .header-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .stat-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--card-border);
+    border-radius: 4px;
+    min-width: 70px;
+  }
+  .stat-pill .val {
+    font-family: var(--font-data);
+    font-size: 18px;
+    color: var(--cyan);
+    line-height: 1;
+  }
+  .stat-pill .lbl {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .btn {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: 1px solid var(--card-border);
+    background: var(--bg3);
+    color: var(--text);
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+  }
+  .btn:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
+  .btn.primary { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
+  .btn.primary:hover { background: rgba(0,229,255,0.2); }
+  .btn.spinning svg { animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Tabs */
+  .header-tabs {
+    display: flex;
+    gap: 0;
+    margin-top: 4px;
+  }
+  .tab {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    cursor: pointer;
+    color: var(--text-dim);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  /* ─── FILTERS ─── */
+  .filters {
+    position: relative; z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--card-border);
+    flex-wrap: wrap;
+  }
+  .filter-label { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
+  .filter-group { display: flex; gap: 4px; }
+  .filter-btn {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    padding: 5px 12px;
+    border: 1px solid var(--card-border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+  }
+  .filter-btn.active { background: var(--cyan-dim); border-color: var(--cyan); color: var(--cyan); }
+  .filter-btn:hover:not(.active) { border-color: var(--gray); color: var(--text); }
+  .filter-sep { width: 1px; background: var(--card-border); margin: 0 4px; }
+  .filters-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  #quota-display { font-family: var(--font-data); font-size: 11px; color: var(--text-dim); }
+
+  /* ─── MAIN CONTENT ─── */
+  main {
+    position: relative; z-index: 10;
+    padding: 20px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* ─── LOADING ─── */
+  #loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    gap: 16px;
+  }
+  .loader-ring {
+    width: 64px; height: 64px;
+    border: 3px solid var(--card-border);
+    border-top-color: var(--cyan);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .loader-text {
+    font-family: var(--font-data);
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  #loading-log {
+    font-family: var(--font-data);
+    font-size: 11px;
+    color: var(--cyan);
+    text-align: center;
+    min-height: 16px;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ─── ERROR ─── */
+  #error-state {
+    display: none;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .error-box {
+    display: inline-block;
+    border: 1px solid var(--red);
+    background: rgba(255,51,102,0.06);
+    padding: 24px 32px;
+    border-radius: 4px;
+  }
+  .error-box h3 { color: var(--red); font-family: var(--font-head); letter-spacing: 2px; font-size: 20px; margin-bottom: 8px; }
+  .error-box p { color: var(--text-dim); font-size: 14px; }
+
+  /* ─── NO GAMES ─── */
+  #no-games {
+    display: none;
+    padding: 60px 24px;
+    text-align: center;
+  }
+  .no-games-inner { color: var(--text-dim); font-family: var(--font-data); font-size: 13px; letter-spacing: 1px; }
+
+  /* ─── SECTION HEADING ─── */
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .section-heading h2 {
+    font-family: var(--font-head);
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: var(--text);
+    text-transform: uppercase;
+  }
+  .section-heading .count {
+    font-family: var(--font-data);
+    font-size: 11px;
+    color: var(--text-dim);
+    background: var(--bg3);
+    border: 1px solid var(--card-border);
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+  .section-heading .line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--card-border), transparent);
+  }
+
+  /* ─── DIAMOND PLAYS ─── */
+  .diamond-plays {
+    background: linear-gradient(135deg, rgba(0,229,255,0.05), rgba(180,79,255,0.05));
+    border: 1px solid rgba(0,229,255,0.3);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .diamond-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .diamond-icon { font-size: 20px; }
+  .diamond-title {
+    font-family: var(--font-head);
+    font-size: 18px;
+    letter-spacing: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .diamond-subtitle { font-size: 12px; color: var(--text-dim); margin-left: auto; }
+  .diamond-list { display: flex; gap: 10px; flex-wrap: wrap; }
+  .diamond-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,229,255,0.06);
+    border: 1px solid rgba(0,229,255,0.25);
+    border-radius: 4px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .diamond-chip:hover { background: rgba(0,229,255,0.12); border-color: var(--cyan); }
+  .diamond-chip .dc-grade { font-family: var(--font-data); font-size: 11px; color: var(--green); }
+  .diamond-chip .dc-edge { font-size: 11px; color: var(--cyan); font-family: var(--font-data); }
+
+  /* ─── GAMES GRID ─── */
+  #games-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(300px, 45vw, 580px), 1fr));
+    gap: 16px;
+  }
+
+  /* ─── GAME CARD ─── */
+  .game-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+  }
+  .game-card:hover { border-color: var(--gray); transform: translateY(-1px); }
+  .game-card.has-diamond { border-color: rgba(0,229,255,0.4); }
+  .game-card.has-diamond::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple), var(--cyan));
+  }
+
+  .card-header {
+    padding: 14px 16px 10px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--card-border);
+    background: linear-gradient(180deg, var(--bg3) 0%, transparent 100%);
+  }
+  .teams-block { flex: 1; }
+  .matchup-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .team-name {
+    font-family: var(--font-head);
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: #fff;
+    line-height: 1;
+  }
+  .vs-separator {
+    font-family: var(--font-data);
+    font-size: 10px;
+    color: var(--text-dim);
+    padding: 0 2px;
+  }
+  .game-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .game-time {
+    font-family: var(--font-data);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+  .live-badge {
+    font-family: var(--font-data);
+    font-size: 9px;
+    letter-spacing: 1px;
+    background: rgba(255,51,102,0.15);
+    border: 1px solid var(--red);
+    color: var(--red);
+    padding: 2px 6px;
+    border-radius: 2px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  .card-badges { display: flex; gap: 6px; align-items: flex-start; }
+  .diamond-badge {
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  /* ─── PICKS ROW ─── */
+  .picks-section { padding: 12px 16px; }
+  .picks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .pick-box {
+    background: var(--bg3);
+    border: 1px solid var(--card-border);
+    border-radius: 4px;
+    padding: 10px 10px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .pick-box.grade-aplus { border-color: rgba(0,255,135,0.5); }
+  .pick-box.grade-aplus::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,255,135,0.04);
+    pointer-events: none;
+  }
+  .pick-box.grade-a { border-color: rgba(127,255,0,0.4); }
+  .pick-box.grade-a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(127,255,0,0.03);
+    pointer-events: none;
+  }
+  .pick-box.grade-b { border-color: rgba(255,215,0,0.35); }
+  .pick-box.grade-pass { opacity: 0.5; }
+  .pick-box:hover { transform: scale(1.02); }
+  .pick-box.selected-parlay { box-shadow: 0 0 0 2px var(--cyan); }
+  .pick-type {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: var(--font-data);
+  }
+  .pick-value {
+    font-family: var(--font-head);
+    font-size: 17px;
+    letter-spacing: 1px;
+    color: #fff;
+    line-height: 1;
+  }
+  .pick-odds {
+    font-family: var(--font-data);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .pick-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 4px;
+  }
+  .grade-badge {
+    font-family: var(--font-data);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 2px;
+    line-height: 1;
+  }
+  .grade-badge.aplus { background: var(--green); color: #000; }
+  .grade-badge.a { background: #7fff00; color: #000; }
+  .grade-badge.b { background: var(--gold); color: #000; }
+  .grade-badge.pass { background: var(--gray); color: var(--text-dim); }
+  .edge-val {
+    font-family: var(--font-data);
+    font-size: 10px;
+    color: var(--cyan);
+  }
+  .edge-val.negative { color: var(--red); }
+
+  /* ─── CONFIDENCE BAR ─── */
+  .confidence-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+  }
+  .conf-label { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+  .conf-bar-outer {
+    flex: 1;
+    height: 4px;
+    background: var(--bg);
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+  }
+  .conf-bar-inner {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s ease;
+    background: linear-gradient(90deg, var(--cyan), var(--green));
+  }
+  .conf-pct { font-family: var(--font-data); font-size: 11px; color: var(--cyan); white-space: nowrap; }
+
+  /* ─── CARD FOOTER ─── */
+  .card-footer {
+    padding: 8px 16px;
+    border-top: 1px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg2);
+  }
+  .kelly-display {
+    font-family: var(--font-data);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .kelly-display span { color: var(--gold); }
+  .expand-btn {
+    font-family: var(--font-data);
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .expand-btn:hover { color: var(--cyan); }
+  .parlay-btn {
+    font-family: var(--font-data);
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    background: none;
+    border: 1px solid var(--card-border);
+    cursor: pointer;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    transition: all 0.15s;
+  }
+  .parlay-btn:hover, .parlay-btn.active { color: var(--purple); border-color: var(--purple); background: rgba(180,79,255,0.08); }
+
+  /* ─── MATH BREAKDOWN ─── */
+  .math-breakdown {
+    display: none;
+    padding: 14px 16px;
+    border-top: 1px solid var(--card-border);
+    background: rgba(0,0,0,0.3);
+  }
+  .math-breakdown.open { display: block; }
+  .math-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-data);
+    font-size: 11px;
+  }
+  .math-table tr { border-bottom: 1px solid rgba(30,30,63,0.5); }
+  .math-table tr:last-child { border-bottom: none; }
+  .math-table td { padding: 5px 4px; color: var(--text-dim); }
+  .math-table td:first-child { color: var(--text); min-width: 140px; }
+  .math-table td:last-child { color: var(--cyan); text-align: right; }
+  .math-table .row-highlight td { color: var(--text); }
+  .math-table .row-highlight td:first-child { color: var(--green); }
+  .math-table .row-highlight td:last-child { color: var(--green); }
+
+  /* ─── PARLAY DOCK ─── */
+  #parlay-dock {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--bg2);
+    border-top: 1px solid var(--cyan);
+    box-shadow: 0 -4px 30px rgba(0,229,255,0.15);
+    z-index: 100;
+    padding: 12px 24px;
+    display: none;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  #parlay-dock.visible { display: flex; }
+  .dock-label {
+    font-family: var(--font-head);
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--cyan);
+    white-space: nowrap;
+  }
+  .dock-legs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+  .dock-leg {
+    font-family: var(--font-data);
+    font-size: 11px;
+    background: var(--bg3);
+    border: 1px solid var(--card-border);
+    padding: 4px 10px;
+    border-radius: 3px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .dock-leg .remove { color: var(--red); font-size: 12px; line-height: 1; }
+  .dock-odds { font-family: var(--font-data); font-size: 14px; color: var(--gold); white-space: nowrap; }
+  .dock-odds span { font-size: 11px; color: var(--text-dim); margin-right: 4px; }
+  .dock-clear {
+    font-family: var(--font-data);
+    font-size: 11px;
+    color: var(--text-dim);
+    background: none;
+    border: 1px solid var(--card-border);
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+  }
+  .dock-clear:hover { border-color: var(--red); color: var(--red); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 600px) {
+    main { padding: 12px; }
+    .filters { padding: 10px 12px; }
+    header { padding: 14px 12px 0; }
+    #games-container { grid-template-columns: 1fr; }
+    .picks-grid { grid-template-columns: 1fr 1fr; }
+    .header-stats { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-top">
+    <div class="logo-block">
+      <div class="logo-text">COURTSIDE SKEPTIC</div>
+      <div class="logo-badge">AI v3.0</div>
+    </div>
+    <div class="header-stats">
+      <div class="stat-pill">
+        <div class="val" id="stat-games">—</div>
+        <div class="lbl">Games</div>
+      </div>
+      <div class="stat-pill">
+        <div class="val" id="stat-aplus">—</div>
+        <div class="lbl">A+ Plays</div>
+      </div>
+      <div class="stat-pill">
+        <div class="val" id="stat-diamonds">—</div>
+        <div class="lbl">Diamonds</div>
+      </div>
+      <div class="stat-pill">
+        <div class="val" id="stat-avg-edge">—</div>
+        <div class="lbl">Avg Edge</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn primary" id="refresh-btn" onclick="loadGames()">
+        <svg id="refresh-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        REFRESH
+      </button>
+    </div>
+  </div>
+  <div class="header-tabs">
+    <div class="tab active" data-tab="today" onclick="switchTab(this)">Today's Board</div>
+    <div class="tab" data-tab="parlay" onclick="switchTab(this)">Parlay Builder</div>
+    <div class="tab" data-tab="system" onclick="switchTab(this)">System Info</div>
+  </div>
+</header>
+
+<!-- FILTERS -->
+<div class="filters">
+  <div class="filter-label">Grade</div>
+  <div class="filter-group">
+    <button class="filter-btn active" data-grade="all" onclick="setGradeFilter(this,'all')">All</button>
+    <button class="filter-btn" data-grade="A+" onclick="setGradeFilter(this,'A+')">A+</button>
+    <button class="filter-btn" data-grade="A" onclick="setGradeFilter(this,'A')">A</button>
+    <button class="filter-btn" data-grade="B" onclick="setGradeFilter(this,'B')">B</button>
+  </div>
+  <div class="filter-sep"></div>
+  <div class="filter-label">Sort</div>
+  <div class="filter-group">
+    <button class="filter-btn active" data-sort="grade" onclick="setSortFilter(this,'grade')">Grade</button>
+    <button class="filter-btn" data-sort="edge" onclick="setSortFilter(this,'edge')">Edge</button>
+    <button class="filter-btn" data-sort="time" onclick="setSortFilter(this,'time')">Game Time</button>
+  </div>
+  <div class="filters-right">
+    <span id="quota-display"></span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+  <!-- Loading -->
+  <div id="loading">
+    <div class="loader-ring"></div>
+    <div class="loader-text">LOADING INTEL</div>
+    <div id="loading-log">Connecting to odds feed...</div>
+  </div>
+
+  <!-- Error -->
+  <div id="error-state">
+    <div class="error-box">
+      <h3>FEED OFFLINE</h3>
+      <p id="error-msg">Could not reach data providers. Check API keys or try again.</p>
+    </div>
+  </div>
+
+  <!-- No Games -->
+  <div id="no-games">
+    <div class="no-games-inner">// NO NBA GAMES SCHEDULED FOR TODAY //</div>
+  </div>
+
+  <!-- Content -->
+  <div id="content" style="display:none">
+
+    <!-- Diamond Plays -->
+    <div id="diamond-section" class="diamond-plays" style="display:none">
+      <div class="diamond-header">
+        <div class="diamond-icon">💎</div>
+        <div class="diamond-title">DIAMOND PLAYS</div>
+        <div class="diamond-subtitle">Multi-signal convergence — highest confidence</div>
+      </div>
+      <div class="diamond-list" id="diamond-list"></div>
+    </div>
+
+    <!-- Games -->
+    <div class="section-heading">
+      <h2>Today's Board</h2>
+      <div class="count" id="games-count">0 Games</div>
+      <div class="line"></div>
+    </div>
+    <div id="games-container"></div>
+
+  </div>
+</main>
+
+<!-- PARLAY DOCK -->
+<div id="parlay-dock">
+  <div class="dock-label">🧾 PARLAY</div>
+  <div class="dock-legs" id="dock-legs"></div>
+  <div class="dock-odds"><span>PAYOUT</span><span id="dock-payout">—</span></div>
+  <button class="dock-clear" onclick="clearParlay()">CLEAR</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════
+const CONFIG = {
+  ODDS_API_KEY: 'fe99536c-5513-4f73-9c2e-07aef88cd6e6',
+  NINJA_API_KEY: '1c2c4821ee7989a710931a8e3991933a',
+  ODDS_BASE: 'https://api.the-odds-api.com/v4',
+  NINJA_BASE: 'https://api.api-ninjas.com/v1',
+};
+
+// ═══════════════════════════════════════════════
+//  TEAM ELO RATINGS (2025-26 season estimate)
+// ═══════════════════════════════════════════════
+const TEAM_ELO = {
+  'Oklahoma City Thunder': 1668, 'OKC Thunder': 1668, 'Thunder': 1668,
+  'Boston Celtics': 1632, 'Celtics': 1632,
+  'Cleveland Cavaliers': 1615, 'Cavaliers': 1615,
+  'Denver Nuggets': 1590, 'Nuggets': 1590,
+  'Minnesota Timberwolves': 1558, 'Timberwolves': 1558,
+  'Indiana Pacers': 1548, 'Pacers': 1548,
+  'Golden State Warriors': 1542, 'Warriors': 1542,
+  'New York Knicks': 1538, 'Knicks': 1538,
+  'Orlando Magic': 1520, 'Magic': 1520,
+  'Milwaukee Bucks': 1512, 'Bucks': 1512,
+  'Miami Heat': 1510, 'Heat': 1510,
+  'Philadelphia 76ers': 1498, '76ers': 1498,
+  'Los Angeles Lakers': 1495, 'Lakers': 1495,
+  'Sacramento Kings': 1488, 'Kings': 1488,
+  'Dallas Mavericks': 1480, 'Mavericks': 1480,
+  'Phoenix Suns': 1462, 'Suns': 1462,
+  'Los Angeles Clippers': 1458, 'Clippers': 1458,
+  'Houston Rockets': 1545, 'Rockets': 1545,
+  'Memphis Grizzlies': 1452, 'Grizzlies': 1452,
+  'Chicago Bulls': 1435, 'Bulls': 1435,
+  'Atlanta Hawks': 1422, 'Hawks': 1422,
+  'Brooklyn Nets': 1418, 'Nets': 1418,
+  'New Orleans Pelicans': 1410, 'Pelicans': 1410,
+  'Detroit Pistons': 1448, 'Pistons': 1448,
+  'Utah Jazz': 1375, 'Jazz': 1375,
+  'Toronto Raptors': 1382, 'Raptors': 1382,
+  'Charlotte Hornets': 1368, 'Hornets': 1368,
+  'Portland Trail Blazers': 1358, 'Trail Blazers': 1358,
+  'Washington Wizards': 1335, 'Wizards': 1335,
+  'San Antonio Spurs': 1392, 'Spurs': 1392,
+};
+
+// Team offensive/defensive ratings for Poisson totals
+const TEAM_RATINGS = {
+  'Oklahoma City Thunder': { ort: 117.2, drt: 106.8 },
+  'Boston Celtics': { ort: 119.8, drt: 109.2 },
+  'Cleveland Cavaliers': { ort: 115.6, drt: 107.4 },
+  'Denver Nuggets': { ort: 116.9, drt: 110.1 },
+  'Minnesota Timberwolves': { ort: 113.8, drt: 108.6 },
+  'Indiana Pacers': { ort: 120.4, drt: 114.2 },
+  'Golden State Warriors': { ort: 117.6, drt: 111.8 },
+  'New York Knicks': { ort: 114.2, drt: 109.8 },
+  'Orlando Magic': { ort: 111.8, drt: 107.2 },
+  'Milwaukee Bucks': { ort: 116.4, drt: 112.6 },
+  'Miami Heat': { ort: 113.6, drt: 110.4 },
+  'Philadelphia 76ers': { ort: 115.8, drt: 113.2 },
+  'Los Angeles Lakers': { ort: 115.2, drt: 112.4 },
+  'Sacramento Kings': { ort: 116.8, drt: 113.8 },
+  'Dallas Mavericks': { ort: 118.4, drt: 114.6 },
+  'Phoenix Suns': { ort: 114.6, drt: 115.8 },
+  'Houston Rockets': { ort: 116.2, drt: 108.4 },
+  'Memphis Grizzlies': { ort: 112.8, drt: 113.6 },
+  'Chicago Bulls': { ort: 112.4, drt: 115.2 },
+  'Atlanta Hawks': { ort: 115.6, drt: 116.8 },
+  'Brooklyn Nets': { ort: 111.2, drt: 117.4 },
+  'New Orleans Pelicans': { ort: 112.6, drt: 113.8 },
+  'Detroit Pistons': { ort: 113.8, drt: 112.6 },
+  'Los Angeles Clippers': { ort: 113.2, drt: 112.8 },
+  'Utah Jazz': { ort: 110.4, drt: 119.2 },
+  'Toronto Raptors': { ort: 110.8, drt: 118.4 },
+  'Charlotte Hornets': { ort: 111.6, drt: 120.2 },
+  'Portland Trail Blazers': { ort: 109.8, drt: 118.8 },
+  'Washington Wizards': { ort: 108.6, drt: 121.4 },
+  'San Antonio Spurs': { ort: 111.4, drt: 116.6 },
+};
+
+const NBA_LEAGUE_AVG_PACE = 100.2;
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let allGames = [];
+let gradeFilter = 'all';
+let sortFilter = 'grade';
+let parlayLegs = [];
+
+// ═══════════════════════════════════════════════
+//  MATH ENGINE
+// ═══════════════════════════════════════════════
+function eloWinProb(homeElo, awayElo, homeAdvantage = 35) {
+  const diff = homeElo - awayElo + homeAdvantage;
+  return 1 / (1 + Math.pow(10, -diff / 400));
+}
+
+function americanToDecimal(odds) {
+  if (odds > 0) return (odds / 100) + 1;
+  return (100 / Math.abs(odds)) + 1;
+}
+
+function americanToImplied(odds) {
+  if (odds > 0) return 100 / (odds + 100);
+  return Math.abs(odds) / (Math.abs(odds) + 100);
+}
+
+function impliedToAmerican(prob) {
+  if (prob >= 0.5) return Math.round(-(prob / (1 - prob)) * 100);
+  return Math.round(((1 - prob) / prob) * 100);
+}
+
+// Remove vig from two-sided market
+function devig(impliedHome, impliedAway) {
+  const total = impliedHome + impliedAway;
+  return { home: impliedHome / total, away: impliedAway / total };
+}
+
+function spreadToWinProb(spread) {
+  // Each point worth ~3% win probability
+  const homeWinPct = 0.5 + (spread * -0.031);
+  return Math.max(0.05, Math.min(0.95, homeWinPct));
+}
+
+// Poisson-based expected total
+function poissonTotal(home, away) {
+  const hr = TEAM_RATINGS[home] || { ort: 114, drt: 113 };
+  const ar = TEAM_RATINGS[away] || { ort: 114, drt: 113 };
+  const homeScore = (hr.ort + ar.drt) / 2 * (NBA_LEAGUE_AVG_PACE / 100);
+  const awayScore = (ar.ort + hr.drt) / 2 * (NBA_LEAGUE_AVG_PACE / 100);
+  return homeScore + awayScore;
+}
+
+function kellyFraction(edge, decimalOdds) {
+  const b = decimalOdds - 1;
+  const p = (1 / decimalOdds) + edge;
+  const q = 1 - p;
+  if (b <= 0) return 0;
+  const k = (b * p - q) / b;
+  return Math.max(0, Math.min(k * 0.25, 0.04)); // quarter Kelly, cap 4%
+}
+
+function gradePlay(edge) {
+  if (edge >= 0.085) return 'A+';
+  if (edge >= 0.055) return 'A';
+  if (edge >= 0.03) return 'B';
+  return 'PASS';
+}
+
+function gradeClass(grade) {
+  return { 'A+': 'aplus', 'A': 'a', 'B': 'b', 'PASS': 'pass' }[grade] || 'pass';
+}
+
+function gradePickClass(grade) {
+  return { 'A+': 'grade-aplus', 'A': 'grade-a', 'B': 'grade-b', 'PASS': 'grade-pass' }[grade] || 'grade-pass';
+}
+
+// ═══════════════════════════════════════════════
+//  PREDICTION ENGINE
+// ═══════════════════════════════════════════════
+function analyzeGame(game) {
+  const home = game.home_team;
+  const away = game.away_team;
+  const homeElo = getElo(home);
+  const awayElo = getElo(away);
+  const ourWinProb = eloWinProb(homeElo, awayElo);
+  const ourSpreadEst = -(homeElo - awayElo + 35) * 0.03;
+
+  // Extract odds from bookmakers
+  const { mlHome, mlAway, spread, spreadOddsHome, spreadOddsAway, total, overOdds, underOdds } = extractOdds(game.bookmakers || []);
+
+  const result = { home, away, homeElo, awayElo, ourWinProb, game };
+
+  // ── ML PICK ──
+  if (mlHome && mlAway) {
+    const { home: vigFreeHome, away: vigFreeAway } = devig(americanToImplied(mlHome), americanToImplied(mlAway));
+    const ourPickHome = ourWinProb > 0.5;
+    const ourProb = ourPickHome ? ourWinProb : (1 - ourWinProb);
+    const bookProb = ourPickHome ? vigFreeHome : vigFreeAway;
+    const edge = ourProb - bookProb;
+    const odds = ourPickHome ? mlHome : mlAway;
+    const pickTeam = ourPickHome ? home : away;
+    const kelly = kellyFraction(edge, americanToDecimal(odds));
+    result.ml = {
+      pick: pickTeam, odds, edge, grade: gradePlay(edge), kelly,
+      ourProb, bookProb, mlHome, mlAway, vigFreeHome, vigFreeAway,
+    };
+  }
+
+  // ── SPREAD PICK ──
+  if (spread !== null) {
+    const homeCover = ourSpreadEst < spread;
+    const bookCoverProb = spreadToWinProb(spread);
+    const ourCoverProb = homeCover ? 1 - bookCoverProb + 0.04 : bookCoverProb - 0.04;
+    const spreadEdge = Math.abs(ourSpreadEst - spread) * 0.015;
+    const adjustedEdge = homeCover ? spreadEdge : spreadEdge * 0.85;
+    const spreadOdds = homeCover ? (spreadOddsHome || -110) : (spreadOddsAway || -110);
+    const kelly = kellyFraction(adjustedEdge, americanToDecimal(spreadOdds));
+    result.spread = {
+      pick: homeCover ? `${home} ${spread > 0 ? '+' : ''}${spread}` : `${away} +${Math.abs(spread)}`,
+      pickTeam: homeCover ? home : away,
+      spreadLine: spread,
+      odds: spreadOdds,
+      edge: adjustedEdge,
+      grade: gradePlay(adjustedEdge),
+      kelly,
+      ourEstimate: ourSpreadEst.toFixed(1),
+    };
+  }
+
+  // ── TOTAL PICK ──
+  if (total !== null) {
+    const ourTotal = poissonTotal(home, away);
+    const diff = Math.abs(ourTotal - total);
+    const overUnder = ourTotal > total ? 'OVER' : 'UNDER';
+    const totalEdge = Math.min(diff * 0.012, 0.12);
+    const totalOdds = overUnder === 'OVER' ? (overOdds || -110) : (underOdds || -110);
+    const kelly = kellyFraction(totalEdge, americanToDecimal(totalOdds));
+    result.total = {
+      pick: `${overUnder} ${total}`,
+      direction: overUnder,
+      line: total,
+      odds: totalOdds,
+      edge: totalEdge,
+      grade: gradePlay(totalEdge),
+      kelly,
+      ourEstimate: ourTotal.toFixed(1),
+    };
+  }
+
+  // Confidence (average of non-PASS picks)
+  const picks = [result.ml, result.spread, result.total].filter(Boolean);
+  const edgePicks = picks.filter(p => p.grade !== 'PASS');
+  result.confidence = edgePicks.length > 0
+    ? edgePicks.reduce((s, p) => s + (p.edge + 0.45), 0) / edgePicks.length
+    : 0.45;
+  result.confidence = Math.min(0.95, Math.max(0.35, result.confidence));
+
+  // Diamond play = A+ on 2+ bet types
+  const aplusCount = picks.filter(p => p.grade === 'A+').length;
+  const aOrBetter = picks.filter(p => ['A+', 'A'].includes(p.grade)).length;
+  result.isDiamond = aplusCount >= 1 && aOrBetter >= 2;
+
+  // Best grade
+  const grades = ['A+', 'A', 'B', 'PASS'];
+  result.bestGrade = grades.find(g => picks.some(p => p.grade === g)) || 'PASS';
+
+  // Best edge
+  result.bestEdge = Math.max(...picks.map(p => p.edge || 0));
+
+  return result;
+}
+
+function getElo(team) {
+  if (TEAM_ELO[team]) return TEAM_ELO[team];
+  // fuzzy match on last word
+  const last = team.split(' ').pop();
+  const found = Object.keys(TEAM_ELO).find(k => k.includes(last));
+  return found ? TEAM_ELO[found] : 1450;
+}
+
+function extractOdds(bookmakers) {
+  const result = { mlHome: null, mlAway: null, spread: null, spreadOddsHome: null, spreadOddsAway: null, total: null, overOdds: null, underOdds: null };
+  const priority = ['draftkings', 'fanduel', 'betmgm', 'caesars', 'pointsbetus'];
+  
+  let book = bookmakers.find(b => priority.includes(b.key)) || bookmakers[0];
+  if (!book) return result;
+
+  for (const market of (book.markets || [])) {
+    if (market.key === 'h2h') {
+      for (const o of market.outcomes) {
+        if (o.name === book.markets[0]?.outcomes[0]?.name) result.mlHome = o.price;
+        else result.mlAway = o.price;
+      }
+      // set by index
+      result.mlHome = market.outcomes[0]?.price;
+      result.mlAway = market.outcomes[1]?.price;
+    }
+    if (market.key === 'spreads') {
+      result.spread = market.outcomes[0]?.point;
+      result.spreadOddsHome = market.outcomes[0]?.price;
+      result.spreadOddsAway = market.outcomes[1]?.price;
+    }
+    if (market.key === 'totals') {
+      const over = market.outcomes.find(o => o.name === 'Over');
+      const under = market.outcomes.find(o => o.name === 'Under');
+      result.total = over?.point || under?.point;
+      result.overOdds = over?.price;
+      result.underOdds = under?.price;
+    }
+  }
+  return result;
+}
+
+// ═══════════════════════════════════════════════
+//  API CALLS
+// ═══════════════════════════════════════════════
+async function fetchOdds() {
+  const url = `${CONFIG.ODDS_BASE}/sports/basketball_nba/odds/?apiKey=${CONFIG.ODDS_API_KEY}&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`Odds API: ${resp.status} ${resp.statusText}`);
+  // Log quota
+  const remaining = resp.headers.get('x-requests-remaining');
+  const used = resp.headers.get('x-requests-used');
+  if (remaining) document.getElementById('quota-display').textContent = `API quota: ${remaining} remaining`;
+  return resp.json();
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════
+function formatOdds(odds) {
+  if (!odds) return 'N/A';
+  return odds > 0 ? `+${odds}` : `${odds}`;
+}
+
+function formatTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+}
+
+function formatEdge(edge) {
+  const pct = (edge * 100).toFixed(1);
+  return edge >= 0 ? `+${pct}%` : `${pct}%`;
+}
+
+function renderPick(p, type, gameId) {
+  if (!p) return `<div class="pick-box grade-pass"><div class="pick-type">${type}</div><div class="pick-value" style="font-size:14px;color:var(--text-dim)">N/A</div></div>`;
+  const gradeC = gradeClass(p.grade);
+  const pickC = gradePickClass(p.grade);
+  const edgeClass = p.edge >= 0 ? '' : 'negative';
+  return `
+    <div class="pick-box ${pickC}" onclick="toggleParlay('${gameId}','${type}',this)" title="Click to add to parlay">
+      <div class="pick-type">${type}</div>
+      <div class="pick-value">${p.pick}</div>
+      <div class="pick-odds">${formatOdds(p.odds)}</div>
+      <div class="pick-footer">
+        <span class="grade-badge ${gradeC}">${p.grade}</span>
+        <span class="edge-val ${edgeClass}">${formatEdge(p.edge)}</span>
+      </div>
+    </div>`;
+}
+
+function renderMathTable(analysis) {
+  const rows = [];
+  if (analysis.ml) {
+    const m = analysis.ml;
+    rows.push(`<tr><td>Home Elo</td><td></td><td>${analysis.homeElo}</td></tr>`);
+    rows.push(`<tr><td>Away Elo</td><td></td><td>${analysis.awayElo}</td></tr>`);
+    rows.push(`<tr><td>Our Win Prob (home)</td><td></td><td>${(analysis.ourWinProb * 100).toFixed(1)}%</td></tr>`);
+    rows.push(`<tr><td>Book Implied (vig-free)</td><td></td><td>${(m.vigFreeHome * 100).toFixed(1)}%</td></tr>`);
+    rows.push(`<tr class="row-highlight"><td>ML Edge</td><td></td><td>${formatEdge(m.edge)}</td></tr>`);
+  }
+  if (analysis.spread) {
+    const s = analysis.spread;
+    rows.push(`<tr><td>Our Spread Est.</td><td></td><td>${s.ourEstimate}</td></tr>`);
+    rows.push(`<tr><td>Book Spread</td><td></td><td>${s.spreadLine}</td></tr>`);
+    rows.push(`<tr class="row-highlight"><td>Spread Edge</td><td></td><td>${formatEdge(s.edge)}</td></tr>`);
+  }
+  if (analysis.total) {
+    const t = analysis.total;
+    rows.push(`<tr><td>Poisson Total Est.</td><td></td><td>${t.ourEstimate}</td></tr>`);
+    rows.push(`<tr><td>Book Total</td><td></td><td>${t.line}</td></tr>`);
+    rows.push(`<tr class="row-highlight"><td>Total Edge</td><td></td><td>${formatEdge(t.edge)}</td></tr>`);
+  }
+  return rows.join('');
+}
+
+function renderGameCard(analysis, idx) {
+  const g = analysis.game;
+  const isDiamond = analysis.isDiamond;
+  const bestKelly = Math.max(
+    analysis.ml?.kelly || 0,
+    analysis.spread?.kelly || 0,
+    analysis.total?.kelly || 0
+  );
+  const id = `game-${idx}`;
+  const gameTime = formatTime(g.commence_time);
+  const isLive = new Date(g.commence_time) < new Date() && new Date(g.commence_time) > new Date(Date.now() - 3 * 3600000);
+
+  return `
+    <div class="game-card ${isDiamond ? 'has-diamond' : ''}" id="${id}">
+      <div class="card-header">
+        <div class="teams-block">
+          <div class="matchup-line">
+            <div class="team-name">${analysis.away}</div>
+            <div class="vs-separator">@</div>
+            <div class="team-name">${analysis.home}</div>
+          </div>
+          <div class="game-meta">
+            <div class="game-time">${gameTime}</div>
+            ${isLive ? '<div class="live-badge">● LIVE</div>' : ''}
+          </div>
+        </div>
+        <div class="card-badges">
+          ${isDiamond ? '<div class="diamond-badge" title="Diamond Play">💎</div>' : ''}
+        </div>
+      </div>
+
+      <div class="picks-section">
+        <div class="picks-grid">
+          ${renderPick(analysis.ml, 'ML', id)}
+          ${renderPick(analysis.spread, 'SPREAD', id)}
+          ${renderPick(analysis.total, 'TOTAL', id)}
+        </div>
+        <div class="confidence-row">
+          <div class="conf-label">Confidence</div>
+          <div class="conf-bar-outer">
+            <div class="conf-bar-inner" style="width:${(analysis.confidence * 100).toFixed(0)}%"></div>
+          </div>
+          <div class="conf-pct">${(analysis.confidence * 100).toFixed(0)}%</div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="kelly-display">Kelly: <span>${(bestKelly * 100).toFixed(1)}% unit</span></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="parlay-btn" onclick="addBestPickToParlay('${id}', ${idx})">+ PARLAY</button>
+          <button class="expand-btn" onclick="toggleMath('${id}')">
+            MATH ▾
+          </button>
+        </div>
+      </div>
+
+      <div class="math-breakdown" id="math-${id}">
+        <table class="math-table">
+          <tr><td colspan="3" style="color:var(--text-dim);padding-bottom:6px;letter-spacing:2px;font-size:10px;text-transform:uppercase">Signal Breakdown</td></tr>
+          ${renderMathTable(analysis)}
+        </table>
+      </div>
+    </div>`;
+}
+
+function renderDiamonds(analyses) {
+  const diamonds = analyses.filter(a => a.isDiamond);
+  const section = document.getElementById('diamond-section');
+  const list = document.getElementById('diamond-list');
+  if (diamonds.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  list.innerHTML = diamonds.map((a, i) => {
+    const bestPick = [a.ml, a.spread, a.total].filter(Boolean).sort((x,y) => y.edge - x.edge)[0];
+    return `<div class="diamond-chip" onclick="scrollToGame(${analyses.indexOf(a)})">
+      💎 ${a.away} @ ${a.home}
+      <span class="dc-grade">${bestPick?.grade}</span>
+      <span class="dc-edge">${formatEdge(bestPick?.edge || 0)}</span>
+    </div>`;
+  }).join('');
+}
+
+function updateStats(analyses) {
+  const total = analyses.length;
+  const apluses = analyses.filter(a => a.bestGrade === 'A+').length;
+  const diamonds = analyses.filter(a => a.isDiamond).length;
+  const avgEdge = analyses.length > 0 
+    ? analyses.reduce((s,a) => s + a.bestEdge, 0) / analyses.length 
+    : 0;
+  document.getElementById('stat-games').textContent = total;
+  document.getElementById('stat-aplus').textContent = apluses;
+  document.getElementById('stat-diamonds').textContent = diamonds;
+  document.getElementById('stat-avg-edge').textContent = `${(avgEdge*100).toFixed(1)}%`;
+}
+
+// ═══════════════════════════════════════════════
+//  FILTER + SORT
+// ═══════════════════════════════════════════════
+function applyFiltersAndRender() {
+  let filtered = [...allGames];
+
+  if (gradeFilter !== 'all') {
+    filtered = filtered.filter(a => {
+      const grades = ['A+','A','B'].indexOf(gradeFilter);
+      const bestGrades = ['A+','A','B'].indexOf(a.bestGrade);
+      return bestGrades <= grades;
+    });
+  }
+
+  if (sortFilter === 'grade') {
+    const order = ['A+','A','B','PASS'];
+    filtered.sort((a,b) => order.indexOf(a.bestGrade) - order.indexOf(b.bestGrade));
+  } else if (sortFilter === 'edge') {
+    filtered.sort((a,b) => b.bestEdge - a.bestEdge);
+  } else if (sortFilter === 'time') {
+    filtered.sort((a,b) => new Date(a.game.commence_time) - new Date(b.game.commence_time));
+  }
+
+  const container = document.getElementById('games-container');
+  const count = document.getElementById('games-count');
+  count.textContent = `${filtered.length} Game${filtered.length !== 1 ? 's' : ''}`;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-dim);font-family:var(--font-data);font-size:12px;letter-spacing:2px">// NO GAMES MATCH FILTERS //</div>`;
+  } else {
+    container.innerHTML = filtered.map((a, i) => renderGameCard(a, allGames.indexOf(a))).join('');
+    // Animate confidence bars
+    setTimeout(() => {
+      document.querySelectorAll('.conf-bar-inner').forEach(el => {
+        const w = el.style.width;
+        el.style.width = '0';
+        requestAnimationFrame(() => { el.style.width = w; });
+      });
+    }, 50);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  MAIN LOAD
+// ═══════════════════════════════════════════════
+async function loadGames() {
+  const btn = document.getElementById('refresh-btn');
+  const refreshIcon = document.getElementById('refresh-icon');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+
+  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('content').style.display = 'none';
+  document.getElementById('error-state').style.display = 'none';
+  document.getElementById('no-games').style.display = 'none';
+
+  const log = (msg) => { document.getElementById('loading-log').textContent = msg; };
+
+  try {
+    log('Fetching live NBA odds...');
+    const games = await fetchOdds();
+
+    log(`Processing ${games.length} games...`);
+    await new Promise(r => setTimeout(r, 400));
+
+    if (games.length === 0) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('no-games').style.display = 'block';
+      return;
+    }
+
+    log('Running prediction engine...');
+    await new Promise(r => setTimeout(r, 300));
+
+    allGames = games.map(g => analyzeGame(g));
+
+    log('Calculating edges & grades...');
+    await new Promise(r => setTimeout(r, 200));
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+
+    renderDiamonds(allGames);
+    updateStats(allGames);
+    applyFiltersAndRender();
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error-state').style.display = 'block';
+    document.getElementById('error-msg').textContent = err.message || 'Unknown error. Check API key and network.';
+  } finally {
+    btn.classList.remove('spinning');
+    btn.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  UI INTERACTIONS
+// ═══════════════════════════════════════════════
+function toggleMath(id) {
+  const el = document.getElementById('math-' + id);
+  el.classList.toggle('open');
+  const btn = el.previousElementSibling?.querySelector('.expand-btn');
+  if (btn) btn.textContent = el.classList.contains('open') ? 'MATH ▴' : 'MATH ▾';
+}
+
+function scrollToGame(idx) {
+  const el = document.getElementById('game-' + idx);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function switchTab(el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setGradeFilter(el, grade) {
+  document.querySelectorAll('.filter-btn[data-grade]').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  gradeFilter = grade;
+  applyFiltersAndRender();
+}
+
+function setSortFilter(el, sort) {
+  document.querySelectorAll('.filter-btn[data-sort]').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  sortFilter = sort;
+  applyFiltersAndRender();
+}
+
+// ═══════════════════════════════════════════════
+//  PARLAY
+// ═══════════════════════════════════════════════
+function addBestPickToParlay(cardId, idx) {
+  const analysis = allGames[idx];
+  if (!analysis) return;
+  const picks = [analysis.ml, analysis.spread, analysis.total].filter(Boolean);
+  const best = picks.sort((a,b) => b.edge - a.edge)[0];
+  if (!best || best.grade === 'PASS') return;
+  const leg = {
+    id: `${cardId}-best`,
+    label: `${best.pick} (${formatOdds(best.odds)})`,
+    odds: best.odds,
+    game: `${analysis.away} @ ${analysis.home}`,
+  };
+  addLeg(leg);
+}
+
+function toggleParlay(gameId, type, el) {
+  const legId = `${gameId}-${type}`;
+  const exists = parlayLegs.find(l => l.id === legId);
+  if (exists) {
+    parlayLegs = parlayLegs.filter(l => l.id !== legId);
+    el.classList.remove('selected-parlay');
+  } else {
+    // Get pick data from card
+    const pickVal = el.querySelector('.pick-value')?.textContent || '';
+    const pickOdds = el.querySelector('.pick-odds')?.textContent || '';
+    const oddsNum = parseInt(pickOdds.replace('+',''));
+    addLeg({ id: legId, label: `${pickVal} (${pickOdds})`, odds: oddsNum });
+    el.classList.add('selected-parlay');
+  }
+  renderParlay();
+}
+
+function addLeg(leg) {
+  if (parlayLegs.find(l => l.id === leg.id)) return;
+  if (parlayLegs.length >= 8) return;
+  parlayLegs.push(leg);
+  renderParlay();
+}
+
+function removeLeg(id) {
+  parlayLegs = parlayLegs.filter(l => l.id !== id);
+  // Remove selected state
+  const key = id.split('-').slice(-1)[0];
+  document.querySelectorAll('.pick-box.selected-parlay').forEach(el => el.classList.remove('selected-parlay'));
+  renderParlay();
+}
+
+function clearParlay() {
+  parlayLegs = [];
+  document.querySelectorAll('.pick-box.selected-parlay').forEach(el => el.classList.remove('selected-parlay'));
+  renderParlay();
+}
+
+function renderParlay() {
+  const dock = document.getElementById('parlay-dock');
+  const legList = document.getElementById('dock-legs');
+  const payout = document.getElementById('dock-payout');
+
+  if (parlayLegs.length === 0) {
+    dock.classList.remove('visible');
+    return;
+  }
+  dock.classList.add('visible');
+
+  legList.innerHTML = parlayLegs.map(l => `
+    <div class="dock-leg" onclick="removeLeg('${l.id}')">
+      <span>${l.label}</span>
+      <span class="remove">✕</span>
+    </div>`).join('');
+
+  // Calculate parlay payout
+  const combinedDecimal = parlayLegs.reduce((acc, l) => {
+    return acc * americanToDecimal(l.odds || -110);
+  }, 1);
+  const parlayAmerican = combinedDecimal >= 2
+    ? `+${Math.round((combinedDecimal - 1) * 100)}`
+    : `-${Math.round(100 / (combinedDecimal - 1))}`;
+  payout.textContent = `${parlayAmerican} (${combinedDecimal.toFixed(2)}x)`;
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+loadGames();
+</script>
+</body>
+</html>
