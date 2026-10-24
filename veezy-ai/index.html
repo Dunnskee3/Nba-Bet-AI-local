@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veezy.ai Studio</title>
+<meta name="description" content="Veezy.ai: create AI images, consistent characters and illustrated stories from a single prompt.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f; --bg2: #12121a; --bg3: #1a1a25; --border: #2a2a3a;
+    --text: #f0f0f7; --muted: #8d8da6;
+    --accent: #a855f7; --accent2: #ec4899; --ok: #34d399; --err: #f87171;
+    --grad: linear-gradient(135deg, var(--accent), var(--accent2));
+    --font-head: 'Space Grotesk', sans-serif; --font-ui: 'Inter', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-ui); min-height: 100vh; overflow-x: hidden; }
+  button, input, textarea, select { font-family: inherit; color: inherit; }
+  a { color: inherit; }
+
+  header { position: sticky; top: 0; z-index: 20; background: rgba(10,10,15,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  .bar { max-width: 1280px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .logo { font-family: var(--font-head); font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .logo span { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  nav { display: flex; gap: 4px; flex: 1; overflow-x: auto; }
+  nav button { background: none; border: none; padding: 8px 14px; border-radius: 8px; color: var(--muted); cursor: pointer; font-weight: 500; font-size: 14px; white-space: nowrap; }
+  nav button.active { background: var(--bg3); color: var(--text); }
+  .ghost { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 13px; }
+  .ghost:hover { border-color: var(--accent); }
+
+  main { max-width: 1280px; margin: 0 auto; padding: 24px 16px 60px; }
+  .view { display: none; }
+  .view.active { display: block; }
+  h1 { font-family: var(--font-head); font-size: 30px; margin-bottom: 4px; }
+  .sub { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+
+  .studio { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
+  .panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+  textarea, input[type=text], input[type=password], input[type=number], select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+  textarea { resize: vertical; min-height: 96px; line-height: 1.5; }
+  textarea:focus, input:focus, select:focus { outline: none; border-color: var(--accent); }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; min-width: 0; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg button { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; font-size: 12px; }
+  .seg button.active { border-color: var(--accent); background: rgba(168,85,247,0.15); }
+  .primary { width: 100%; background: var(--grad); border: none; border-radius: 10px; padding: 12px; font-weight: 700; font-size: 15px; cursor: pointer; color: #fff; }
+  .primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .link-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 12px; font-weight: 600; }
+  .link-btn:disabled { opacity: 0.5; cursor: wait; }
+  .hint { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+
+  .styles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .style-card { border: 2px solid transparent; border-radius: 10px; overflow: hidden; cursor: pointer; background: var(--bg3); padding: 0; text-align: left; }
+  .style-card.active { border-color: var(--accent); }
+  .style-card .sw { height: 38px; }
+  .style-card span { display: block; font-size: 11px; padding: 4px 6px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 12px; }
+  .tile { position: relative; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .tile .media { width: 100%; display: block; background: var(--bg3); object-fit: cover; }
+  .tile .ph { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; text-align: center; padding: 16px; }
+  .tile .meta { padding: 8px 10px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+  .tile .meta .p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tile .actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .tile .actions button, .tile .actions a { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 3px 7px; font-size: 11px; cursor: pointer; text-decoration: none; }
+  .shimmer { background: linear-gradient(90deg, var(--bg3) 25%, #23233a 50%, var(--bg3) 75%); background-size: 200% 100%; animation: sh 1.4s infinite; }
+  @keyframes sh { to { background-position: -200% 0; } }
+  .empty { color: var(--muted); text-align: center; padding: 60px 16px; border: 1px dashed var(--border); border-radius: 14px; font-size: 14px; }
+
+  .char-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 12px; }
+  .char { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .char img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: var(--bg3); }
+  .char .body { padding: 10px 12px; }
+  .char h3 { font-family: var(--font-head); font-size: 16px; }
+  .char p { font-size: 12px; color: var(--muted); margin: 4px 0 8px; line-height: 1.5; }
+
+  .story-head { margin: 20px 0 12px; }
+  .story-head h2 { font-family: var(--font-head); font-size: 22px; }
+  .scene .cap { padding: 10px; font-size: 13px; line-height: 1.5; color: #d4d4e4; }
+  .scene .num { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.65); border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; font-size: 13px; z-index: 50; max-width: calc(100% - 32px); display: none; }
+  .toast.err { border-color: var(--err); color: var(--err); }
+
+  dialog { margin: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; width: min(460px, calc(100% - 32px)); color: var(--text); }
+  dialog::backdrop { background: rgba(0,0,0,0.7); }
+  dialog h2 { font-family: var(--font-head); margin-bottom: 8px; }
+  dialog p { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+  .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  .dialog-actions .primary { width: auto; padding: 9px 18px; font-size: 14px; }
+
+  #lightbox { width: min(1000px, calc(100% - 32px)); padding: 12px; }
+  #lightbox img { width: 100%; max-height: 75vh; object-fit: contain; border-radius: 8px; background: var(--bg3); }
+  #lightbox .lb-prompt { font-size: 13px; color: var(--muted); margin: 10px 4px; line-height: 1.5; }
+
+  footer { text-align: center; color: #5a5a72; font-size: 11px; padding: 0 16px 30px; line-height: 1.6; }
+
+  @media (max-width: 860px) {
+    .studio { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <div class="logo">Veezy<span>.ai</span></div>
+    <nav id="nav">
+      <button class="active" data-view="create" type="button">Create</button>
+      <button data-view="characters" type="button">Characters</button>
+      <button data-view="story" type="button">Story</button>
+      <button data-view="library" type="button">Library</button>
+    </nav>
+    <button class="ghost" id="settings-btn" type="button">⚙ Settings</button>
+  </div>
+</header>
+
+<main>
+  <!-- ─── Create ─── -->
+  <section class="view active" id="view-create">
+    <h1>Create</h1>
+    <p class="sub">Type an idea, pick a style and an engine, and Veezy turns it into images.</p>
+    <div class="studio">
+      <div class="panel">
+        <div class="field">
+          <label for="prompt">Prompt <button class="link-btn" id="enhance-btn" type="button" style="float:right">✨ Enhance with Claude</button></label>
+          <textarea id="prompt" placeholder="A neon koi fish swimming through a rainy Tokyo alley at night"></textarea>
+        </div>
+        <div class="field">
+          <label>Style</label>
+          <div class="styles" id="styles"></div>
+        </div>
+        <div class="field">
+          <label>Engine</label>
+          <div class="seg" id="engine-seg"></div>
+          <p class="hint" id="engine-hint"></p>
+        </div>
+        <div class="field">
+          <label>Aspect ratio</label>
+          <div class="seg" id="aspect-seg"></div>
+        </div>
+        <div class="field row">
+          <div><label for="count">Images</label><select id="count"><option>1</option><option>2</option><option selected>4</option></select></div>
+          <div><label for="seed">Seed (blank = random)</label><input id="seed" type="number" min="0" placeholder="random"></div>
+        </div>
+        <div class="field">
+          <label for="char-select">Character (keeps them consistent)</label>
+          <select id="char-select"><option value="">None</option></select>
+        </div>
+        <div class="field">
+          <label for="negative">Avoid</label>
+          <input id="negative" type="text" placeholder="blurry, text, watermark">
+        </div>
+        <button class="primary" id="generate-btn" type="button">Generate</button>
+      </div>
+      <div>
+        <div class="grid" id="results"></div>
+        <div class="empty" id="results-empty">Your creations will appear here.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Characters ─── -->
+  <section class="view" id="view-characters">
+    <h1>Characters</h1>
+    <p class="sub">Save a character once and reuse them in any image or story. Veezy locks in their description and seed so they look the same each time.</p>
+    <div class="studio">
+      <div class="panel">
+        <div class="field"><label for="char-name">Name</label><input id="char-name" type="text" placeholder="Captain Mira"></div>
+        <div class="field">
+          <label for="char-desc">Look <button class="link-btn" id="char-enhance-btn" type="button" style="float:right">✨ Flesh out with Claude</button></label>
+          <textarea id="char-desc" placeholder="Young woman, short silver hair, amber eyes, freckles, worn red pilot jacket with brass buttons"></textarea>
+          <p class="hint">Be specific about the face, hair, clothing and colors. These details are added to every prompt.</p>
+        </div>
+        <button class="primary" id="char-save-btn" type="button">Create character</button>
+      </div>
+      <div>
+        <div class="char-list" id="char-list"></div>
+        <div class="empty" id="char-empty">No characters yet.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Story ─── -->
+  <section class="view" id="view-story">
+    <h1>One-click story</h1>
+    <p class="sub">Write one sentence. Claude plans a storyboard and Veezy illustrates every scene.</p>
+    <div class="studio">
+      <div class="panel">
+        <div class="field"><label for="story-idea">Story idea</label><textarea id="story-idea" placeholder="A lonely lighthouse keeper befriends a whale who can sing in human words"></textarea></div>
+        <div class="field row">
+          <div><label for="story-scenes">Scenes</label><select id="story-scenes"><option>4</option><option selected>6</option><option>8</option></select></div>
+          <div><label for="story-char">Lead character</label><select id="story-char"><option value="">Let Claude invent</option></select></div>
+        </div>
+        <div class="field"><label>Style</label><div class="styles" id="story-styles"></div></div>
+        <button class="primary" id="story-btn" type="button">Make story</button>
+        <p class="hint">Uses your Anthropic key to plan the scenes, and the engine you picked on Create to draw them.</p>
+      </div>
+      <div id="story-out"><div class="empty">Your storyboard will appear here.</div></div>
+    </div>
+  </section>
+
+  <!-- ─── Library ─── -->
+  <section class="view" id="view-library">
+    <h1>Library</h1>
+    <p class="sub">Everything you've made, saved in this browser.</p>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="ghost" id="clear-lib" type="button">Clear library</button></div>
+    <div class="grid" id="library"></div>
+    <div class="empty" id="library-empty">Nothing here yet. Go create something.</div>
+  </section>
+</main>
+
+<footer>Veezy.ai Studio · Free image engine by Pollinations.ai · Planning, prompts and vector art by Claude. Don't use it to make images of real people without their consent, or of characters you don't hold the rights to.</footer>
+
+<div class="toast" id="toast"></div>
+
+<dialog id="settings">
+  <form method="dialog">
+    <h2>Settings</h2>
+    <p>The Flux and Turbo engines are free and need no key. Prompt enhancing, stories and the Vector engine use Claude: paste your Anthropic API key below. It is stored only in this browser and sent straight to Anthropic.</p>
+    <div class="field"><label for="api-key">Anthropic API key</label><input id="api-key" type="password" autocomplete="off" placeholder="sk-ant-..."></div>
+    <div class="dialog-actions">
+      <button class="ghost" value="cancel" type="submit">Cancel</button>
+      <button class="primary" value="save" type="submit">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="lightbox">
+  <form method="dialog">
+    <img id="lb-img" alt="">
+    <p class="lb-prompt" id="lb-prompt"></p>
+    <div class="dialog-actions">
+      <button class="ghost" id="lb-reuse" type="button">Reuse prompt</button>
+      <a class="ghost" id="lb-open" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Open / download</a>
+      <button class="primary" value="close" type="submit">Close</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module">
+import Anthropic from 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.132.0/+esm';
+
+const MODEL = 'claude-opus-5-5';
+const KEYS = { apiKey: 'veezy_api_key', chars: 'veezy_characters', lib: 'veezy_library', engine: 'veezy_engine' };
+const LIB_MAX = 80;
+
+const STYLES = [
+  { id: 'none',      name: 'None',        sw: '#2a2a3a', text: '' },
+  { id: 'photo',     name: 'Photo',       sw: 'linear-gradient(135deg,#3a4a5a,#c9b79c)', text: 'photorealistic, 35mm photograph, natural lighting, sharp focus, high detail' },
+  { id: 'cinematic', name: 'Cinematic',   sw: 'linear-gradient(135deg,#0f2027,#d97706)', text: 'cinematic film still, anamorphic lens, dramatic lighting, color graded, shallow depth of field' },
+  { id: 'anime',     name: 'Anime',       sw: 'linear-gradient(135deg,#f472b6,#60a5fa)', text: 'anime illustration, cel shading, vibrant colors, detailed background, studio quality' },
+  { id: '3d',        name: '3D Render',   sw: 'linear-gradient(135deg,#7c3aed,#22d3ee)', text: '3D render, octane, soft global illumination, stylized, pixar-like, clay materials' },
+  { id: 'watercolor',name: 'Watercolor',  sw: 'linear-gradient(135deg,#bae6fd,#fecdd3)', text: 'delicate watercolor painting, soft washes, paper texture, loose brushwork' },
+  { id: 'oil',       name: 'Oil Paint',   sw: 'linear-gradient(135deg,#78350f,#fbbf24)', text: 'oil painting, impasto brushstrokes, rich colors, classical composition' },
+  { id: 'comic',     name: 'Comic',       sw: 'linear-gradient(135deg,#facc15,#ef4444)', text: 'comic book art, bold ink lines, halftone shading, dynamic composition' },
+  { id: 'pixel',     name: 'Pixel Art',   sw: 'linear-gradient(135deg,#22c55e,#1e3a8a)', text: '16-bit pixel art, limited palette, crisp pixels, retro game aesthetic' },
+];
+
+const ENGINES = [
+  { id: 'flux',   name: 'Flux',   hint: 'Free and high quality, from Pollinations.ai. No key needed.' },
+  { id: 'turbo',  name: 'Turbo',  hint: 'Free and fastest, from Pollinations.ai. Good for quick drafts.' },
+  { id: 'vector', name: 'Vector', hint: 'Claude draws clean, scalable SVG art. Needs your Anthropic key; best for logos, icons and flat illustration.' },
+];
+
+const ASPECTS = [
+  { id: '1:1', w: 1024, h: 1024 }, { id: '4:5', w: 896, h: 1120 }, { id: '3:2', w: 1152, h: 768 },
+  { id: '16:9', w: 1280, h: 720 }, { id: '9:16', w: 720, h: 1280 },
+];
+
+const state = { style: 'none', storyStyle: 'cinematic', engine: 'flux', aspect: '1:1' };
+
+// ─── Utilities ──────────────────────────────────────────────────────────────
+const $ = (id) => document.getElementById(id);
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const store = {
+  get(k, d = null) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
+};
+const randSeed = () => Math.floor(Math.random() * 2_000_000_000);
+const uid = () => Math.random().toString(36).slice(2, 10);
+
+let toastTimer;
+function toast(msg, isErr = false) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isErr ? ' err' : '');
+  t.style.display = 'block';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => (t.style.display = 'none'), 4000);
+}
+
+function errorMessage(err) {
+  if (err instanceof Anthropic.AuthenticationError) return 'Invalid Anthropic API key. Update it in Settings.';
+  if (err instanceof Anthropic.RateLimitError) return 'Rate limited. Wait a moment and try again.';
+  if (err instanceof Anthropic.APIConnectionError) return 'Could not reach the Claude API.';
+  return err?.message || String(err);
+}
+
+// ─── Claude ─────────────────────────────────────────────────────────────────
+function claudeClient() {
+  const apiKey = store.get(KEYS.apiKey, '');
+  if (!apiKey) {
+    $('settings-btn').click();
+    throw new Error('Add your Anthropic API key in Settings first.');
+  }
+  return new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
+}
+
+async function askClaude({ system, prompt, effort = 'low', maxTokens = 4000, schema }) {
+  const client = claudeClient();
+  const msg = await client.beta.messages.stream({
+    model: MODEL,
+    max_tokens: maxTokens,
+    betas: ['server-side-fallback-2026-07-01'],
+    fallbacks: 'default',
+    thinking: { type: 'adaptive' },
+    output_config: schema ? { effort, format: { type: 'json_schema', schema } } : { effort },
+    system,
+    messages: [{ role: 'user', content: prompt }],
+  }).finalMessage();
+
+  if (msg.stop_reason === 'refusal') throw new Error('Claude declined this request. Try rewording it.');
+  if (msg.stop_reason === 'max_tokens') throw new Error('Claude ran out of room. Try a simpler request.');
+  const text = msg.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
+  return schema ? JSON.parse(text) : text;
+}
+
+const enhancePrompt = (idea) => askClaude({
+  system: 'You write prompts for text-to-image models. Expand the idea into one vivid prompt of 40-70 words covering subject, setting, composition, lighting, mood and color. Output only the prompt text, with no quotes or preamble.',
+  prompt: idea,
+});
+
+const fleshOutCharacter = (name, desc) => askClaude({
+  system: 'You design consistent characters for image generation. Write a single 30-60 word visual description that fixes face, age, hair, eyes, build, outfit and signature colors, so the character looks the same in every image. Output only the description.',
+  prompt: `Name: ${name || 'unnamed'}\nNotes: ${desc || 'invent an interesting original character'}`,
+});
+
+const STORY_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['title', 'lead_description', 'scenes'],
+  properties: {
+    title: { type: 'string' },
+    lead_description: { type: 'string' },
+    scenes: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['caption', 'image_prompt'],
+        properties: { caption: { type: 'string' }, image_prompt: { type: 'string' } },
+      },
+    },
+  },
+};
+
+const planStory = (idea, scenes, lead) => askClaude({
+  system: 'You are a storyboard artist. Turn the idea into a short illustrated story with a clear beginning, rising tension and a satisfying ending. Each caption is one or two sentences of narration. Each image_prompt describes only what is visible in that frame (action, setting, camera angle, lighting) in under 50 words. Do not repeat the lead character\'s appearance in image_prompt; it is added automatically. lead_description is a 30-50 word fixed visual description of the main character.',
+  prompt: `Idea: ${idea}\nNumber of scenes: ${scenes}\n${lead ? `Lead character (use this exact look for lead_description): ${lead}` : 'Invent the lead character.'}`,
+  effort: 'medium',
+  maxTokens: 16000,
+  schema: STORY_SCHEMA,
+});
+
+async function drawVector(prompt, w, h) {
+  const text = await askClaude({
+    system: `You are a vector illustrator. Draw the requested scene as a single standalone SVG with viewBox="0 0 ${w} ${h}". Use rich flat shapes, gradients and layering; no external images, fonts, scripts or links. Output only the SVG markup.`,
+    prompt,
+    effort: 'medium',
+    maxTokens: 32000,
+  });
+  const svg = text.match(/<svg[\s\S]*<\/svg>/i);
+  if (!svg) throw new Error('Claude did not return an SVG.');
+  // Rendered via <img src="data:...">, so any script inside the SVG cannot run.
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg[0]);
+}
+
+// ─── Image engines ──────────────────────────────────────────────────────────
+function pollinationsUrl(prompt, { w, h, seed, model, negative }) {
+  const params = new URLSearchParams({ width: w, height: h, seed, model, nologo: 'true', enhance: 'false' });
+  if (negative) params.set('negative', negative);
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?${params}`;
+}
+
+function composePrompt(base, styleId, character) {
+  const style = STYLES.find(s => s.id === styleId)?.text;
+  return [character ? `${character.name}: ${character.desc}` : '', base, style].filter(Boolean).join(', ');
+}
+
+// Resolves to an image src (URL or data URI). Pollinations URLs are validated by loading them.
+async function renderImage(prompt, opts) {
+  if (opts.engine === 'vector') return drawVector(prompt, opts.w, opts.h);
+  const src = pollinationsUrl(prompt, { ...opts, model: opts.engine });
+  await new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = resolve;
+    img.onerror = () => reject(new Error('The image engine failed. Try again or switch engines.'));
+    img.src = src;
+  });
+  return src;
+}
+
+// ─── Library ────────────────────────────────────────────────────────────────
+function saveToLibrary(item) {
+  const lib = store.get(KEYS.lib, []);
+  lib.unshift(item);
+  // Big SVGs can exceed storage; drop the oldest items until it fits.
+  while (lib.length > 0 && (lib.length > LIB_MAX || !store.set(KEYS.lib, lib))) lib.pop();
+}
+
+function tileHTML(item, { removable = false } = {}) {
+  const ratio = (ASPECTS.find(a => a.id === item.aspect) || ASPECTS[0]);
+  return `
+  <div class="tile" data-id="${esc(item.id)}">
+    <img class="media" src="${esc(item.src)}" alt="${esc(item.prompt)}" style="aspect-ratio:${ratio.w}/${ratio.h}" loading="lazy" data-open>
+    <div class="meta">
+      <span class="p" title="${esc(item.prompt)}">${esc(item.engine)} · ${esc(item.prompt)}</span>
+      <span class="actions">
+        <a href="${esc(item.src)}" target="_blank" rel="noopener noreferrer" ${item.src.startsWith('data:') ? `download="veezy-${esc(item.id)}.svg"` : ''}>↓</a>
+        ${removable ? '<button data-remove type="button">✕</button>' : ''}
+      </span>
+    </div>
+  </div>`;
+}
+
+function renderLibrary() {
+  const lib = store.get(KEYS.lib, []);
+  $('library').innerHTML = lib.map(i => tileHTML(i, { removable: true })).join('');
+  $('library-empty').style.display = lib.length ? 'none' : 'block';
+}
+
+// ─── Characters ─────────────────────────────────────────────────────────────
+const getChars = () => store.get(KEYS.chars, []);
+
+function renderCharacters() {
+  const chars = getChars();
+  $('char-list').innerHTML = chars.map(c => `
+    <div class="char" data-id="${esc(c.id)}">
+      <img src="${esc(pollinationsUrl(composePrompt('portrait, head and shoulders, neutral background', 'none', c), { w: 512, h: 512, seed: c.seed, model: 'flux' }))}" alt="${esc(c.name)}" loading="lazy">
+      <div class="body">
+        <h3>${esc(c.name)}</h3>
+        <p>${esc(c.desc)}</p>
+        <div class="row">
+          <button class="ghost" data-use type="button">Use in Create</button>
+          <button class="ghost" data-delete type="button">Delete</button>
+        </div>
+      </div>
+    </div>`).join('');
+  $('char-empty').style.display = chars.length ? 'none' : 'block';
+
+  const options = '<option value="">None</option>' + chars.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+  const keep1 = $('char-select').value, keep2 = $('story-char').value;
+  $('char-select').innerHTML = options;
+  $('story-char').innerHTML = options.replace('>None<', '>Let Claude invent<');
+  $('char-select').value = chars.some(c => c.id === keep1) ? keep1 : '';
+  $('story-char').value = chars.some(c => c.id === keep2) ? keep2 : '';
+}
+
+// ─── Create flow ────────────────────────────────────────────────────────────
+async function generate() {
+  const base = $('prompt').value.trim();
+  if (!base) return toast('Write a prompt first.', true);
+  const character = getChars().find(c => c.id === $('char-select').value);
+  const aspect = ASPECTS.find(a => a.id === state.aspect);
+  const count = Number($('count').value);
+  const fixedSeed = $('seed').value === '' ? null : Number($('seed').value);
+  const prompt = composePrompt(base, state.style, character);
+  const negative = $('negative').value.trim();
+
+  const btn = $('generate-btn');
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+  $('results-empty').style.display = 'none';
+
+  const jobs = Array.from({ length: count }, (_, i) => {
+    const seed = fixedSeed != null ? fixedSeed + i : character ? character.seed + i : randSeed();
+    const id = uid();
+    const ph = document.createElement('div');
+    ph.className = 'tile';
+    ph.innerHTML = `<div class="media ph shimmer" style="aspect-ratio:${aspect.w}/${aspect.h}">Creating…</div>`;
+    $('results').prepend(ph);
+    return renderImage(prompt, { engine: state.engine, w: aspect.w, h: aspect.h, seed, negative })
+      .then(src => {
+        const item = { id, src, prompt, base, engine: state.engine, aspect: state.aspect, seed, ts: Date.now() };
+        saveToLibrary(item);
+        ph.outerHTML = tileHTML(item);
+      })
+      .catch(err => {
+        ph.innerHTML = `<div class="media ph" style="aspect-ratio:${aspect.w}/${aspect.h};color:var(--err)">${esc(errorMessage(err))}</div>`;
+      });
+  });
+
+  await Promise.all(jobs);
+  btn.disabled = false;
+  btn.textContent = 'Generate';
+}
+
+// ─── Story flow ─────────────────────────────────────────────────────────────
+async function makeStory() {
+  const idea = $('story-idea').value.trim();
+  if (!idea) return toast('Write a story idea first.', true);
+  const chosen = getChars().find(c => c.id === $('story-char').value);
+  const btn = $('story-btn');
+  const out = $('story-out');
+  btn.disabled = true;
+  btn.textContent = 'Planning storyboard…';
+  out.innerHTML = '<div class="empty shimmer">Claude is writing your storyboard…</div>';
+
+  try {
+    const plan = await planStory(idea, Number($('story-scenes').value), chosen?.desc);
+    const lead = chosen || { name: 'the hero', desc: plan.lead_description, seed: randSeed() };
+    const aspect = ASPECTS.find(a => a.id === '16:9');
+    btn.textContent = 'Illustrating scenes…';
+
+    out.innerHTML = `
+      <div class="story-head"><h2>${esc(plan.title)}</h2><p class="sub">${esc(lead.desc)}</p></div>
+      <div class="grid" id="story-grid">${plan.scenes.map((s, i) => `
+        <div class="tile scene">
+          <div class="media ph shimmer" style="aspect-ratio:16/9" data-scene="${i}">Scene ${i + 1}…</div>
+          <span class="num">${i + 1}</span>
+          <div class="cap">${esc(s.caption)}</div>
+        </div>`).join('')}
+      </div>`;
+
+    await Promise.all(plan.scenes.map(async (s, i) => {
+      const slot = out.querySelector(`[data-scene="${i}"]`);
+      const prompt = composePrompt(s.image_prompt, state.storyStyle, lead);
+      try {
+        // Same seed across scenes keeps the lead's look as consistent as the engine allows.
+        const src = await renderImage(prompt, { engine: state.engine, w: aspect.w, h: aspect.h, seed: lead.seed });
+        const item = { id: uid(), src, prompt, base: s.image_prompt, engine: state.engine, aspect: '16:9', seed: lead.seed, ts: Date.now(), story: plan.title };
+        saveToLibrary(item);
+        slot.outerHTML = `<img class="media" src="${esc(src)}" alt="${esc(s.caption)}" style="aspect-ratio:16/9" data-open data-prompt="${esc(prompt)}">`;
+      } catch (err) {
+        slot.classList.remove('shimmer');
+        slot.style.color = 'var(--err)';
+        slot.textContent = errorMessage(err);
+      }
+    }));
+  } catch (err) {
+    out.innerHTML = `<div class="empty" style="color:var(--err)">${esc(errorMessage(err))}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Make story';
+  }
+}
+
+// ─── Wiring ─────────────────────────────────────────────────────────────────
+function segmented(containerId, items, key, onChange) {
+  const el = $(containerId);
+  el.innerHTML = items.map(it => `<button type="button" data-id="${it.id}" class="${state[key] === it.id ? 'active' : ''}">${it.name || it.id}</button>`).join('');
+  el.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    state[key] = b.dataset.id;
+    el.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+    onChange?.();
+  });
+}
+
+function stylePicker(containerId, key) {
+  const el = $(containerId);
+  el.innerHTML = STYLES.map(s => `<button type="button" class="style-card ${state[key] === s.id ? 'active' : ''}" data-id="${s.id}"><div class="sw" style="background:${s.sw}"></div><span>${s.name}</span></button>`).join('');
+  el.addEventListener('click', (e) => {
+    const b = e.target.closest('.style-card');
+    if (!b) return;
+    state[key] = b.dataset.id;
+    el.querySelectorAll('.style-card').forEach(x => x.classList.toggle('active', x === b));
+  });
+}
+
+state.engine = ENGINES.some(e => e.id === store.get(KEYS.engine)) ? store.get(KEYS.engine) : 'flux';
+const updateEngineHint = () => { $('engine-hint').textContent = ENGINES.find(e => e.id === state.engine).hint; store.set(KEYS.engine, state.engine); };
+segmented('engine-seg', ENGINES, 'engine', updateEngineHint);
+segmented('aspect-seg', ASPECTS, 'aspect');
+stylePicker('styles', 'style');
+stylePicker('story-styles', 'storyStyle');
+updateEngineHint();
+
+$('nav').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  document.querySelectorAll('#nav button').forEach(x => x.classList.toggle('active', x === b));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + b.dataset.view));
+  if (b.dataset.view === 'library') renderLibrary();
+});
+const goTo = (view) => document.querySelector(`#nav [data-view="${view}"]`).click();
+
+$('generate-btn').addEventListener('click', generate);
+$('story-btn').addEventListener('click', makeStory);
+
+async function withBusy(btn, label, fn) {
+  const old = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = label;
+  try { await fn(); } catch (err) { toast(errorMessage(err), true); }
+  finally { btn.disabled = false; btn.textContent = old; }
+}
+
+$('enhance-btn').addEventListener('click', (e) => withBusy(e.currentTarget, 'Enhancing…', async () => {
+  const idea = $('prompt').value.trim();
+  if (!idea) throw new Error('Write a short idea first.');
+  $('prompt').value = await enhancePrompt(idea);
+}));
+
+$('char-enhance-btn').addEventListener('click', (e) => withBusy(e.currentTarget, 'Writing…', async () => {
+  $('char-desc').value = await fleshOutCharacter($('char-name').value.trim(), $('char-desc').value.trim());
+}));
+
+$('char-save-btn').addEventListener('click', () => {
+  const name = $('char-name').value.trim();
+  const desc = $('char-desc').value.trim();
+  if (!name || !desc) return toast('Give the character a name and a look.', true);
+  const chars = getChars();
+  chars.unshift({ id: uid(), name, desc, seed: randSeed() });
+  store.set(KEYS.chars, chars);
+  $('char-name').value = $('char-desc').value = '';
+  renderCharacters();
+  toast(`${name} is ready to use.`);
+});
+
+$('char-list').addEventListener('click', (e) => {
+  const card = e.target.closest('.char');
+  if (!card) return;
+  if (e.target.closest('[data-delete]')) {
+    store.set(KEYS.chars, getChars().filter(c => c.id !== card.dataset.id));
+    renderCharacters();
+  } else if (e.target.closest('[data-use]')) {
+    $('char-select').value = card.dataset.id;
+    goTo('create');
+  }
+});
+
+// Lightbox for any image marked data-open
+const lightbox = $('lightbox');
+document.addEventListener('click', (e) => {
+  const img = e.target.closest('img[data-open]');
+  if (!img) return;
+  const prompt = img.dataset.prompt || img.alt;
+  $('lb-img').src = img.src;
+  $('lb-prompt').textContent = prompt;
+  $('lb-open').href = img.src;
+  lightbox.dataset.prompt = prompt;
+  lightbox.showModal();
+});
+$('lb-reuse').addEventListener('click', () => {
+  $('prompt').value = lightbox.dataset.prompt || '';
+  lightbox.close();
+  goTo('create');
+});
+
+$('library').addEventListener('click', (e) => {
+  if (!e.target.closest('[data-remove]')) return;
+  const id = e.target.closest('.tile').dataset.id;
+  store.set(KEYS.lib, store.get(KEYS.lib, []).filter(i => i.id !== id));
+  renderLibrary();
+});
+$('clear-lib').addEventListener('click', () => {
+  if (!confirm('Delete everything in your library?')) return;
+  store.set(KEYS.lib, []);
+  renderLibrary();
+});
+
+const settings = $('settings');
+$('settings-btn').addEventListener('click', () => {
+  $('api-key').value = store.get(KEYS.apiKey, '');
+  if (!settings.open) settings.showModal();
+});
+settings.addEventListener('close', () => {
+  if (settings.returnValue === 'save') {
+    store.set(KEYS.apiKey, $('api-key').value.trim());
+    toast('Settings saved.');
+  }
+});
+
+renderCharacters();
+</script>
+</body>
+</html>
