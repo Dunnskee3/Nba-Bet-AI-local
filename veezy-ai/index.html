@@ -4,134 +4,177 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Veezy.ai Studio</title>
-<meta name="description" content="Veezy.ai: create AI images, consistent characters and illustrated stories from a single prompt.">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<meta name="description" content="Veezy.ai: cover art, rollout visuals and music video treatments for independent rap and R&B artists.">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Permanent+Marker&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f; --bg2: #12121a; --bg3: #1a1a25; --border: #2a2a3a;
-    --text: #f0f0f7; --muted: #8d8da6;
-    --accent: #a855f7; --accent2: #ec4899; --ok: #34d399; --err: #f87171;
-    --grad: linear-gradient(135deg, var(--accent), var(--accent2));
-    --font-head: 'Space Grotesk', sans-serif; --font-ui: 'Inter', sans-serif;
+    --ink: #0b0806; --bg2: #15100c; --bg3: #211912; --border: #3a2c1f;
+    --cream: #f3e9d2; --muted: #a8977e;
+    --gold: #e8b14a; --gold2: #f6d48a; --red: #c8102e; --green: #1f8a4c; --clay: #b5562a;
+    --err: #ff6b5b;
+    --kente: repeating-linear-gradient(90deg, var(--gold) 0 18px, var(--ink) 18px 22px, var(--red) 22px 34px, var(--ink) 34px 38px, var(--green) 38px 52px, var(--ink) 52px 56px, var(--gold) 56px 62px, var(--clay) 62px 72px);
+    --font-head: 'Anton', sans-serif; --font-tag: 'Permanent Marker', cursive; --font-ui: 'Inter', sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: var(--font-ui); min-height: 100vh; overflow-x: hidden; }
+  body {
+    color: var(--cream); font-family: var(--font-ui); min-height: 100vh; overflow-x: hidden;
+    background-color: var(--ink);
+    /* Mudcloth-inspired line motif */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' fill='none' stroke='%23e8b14a' stroke-opacity='0.05' stroke-width='2'%3E%3Cpath d='M0 20h120M0 100h120'/%3E%3Cpath d='M10 40l10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10'/%3E%3Cpath d='M10 80l10-10 10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10 10 10'/%3E%3Ccircle cx='30' cy='60' r='3'/%3E%3Ccircle cx='60' cy='60' r='3'/%3E%3Ccircle cx='90' cy='60' r='3'/%3E%3C/svg%3E");
+  }
+  /* Film grain */
+  body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 100; opacity: 0.07; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
   button, input, textarea, select { font-family: inherit; color: inherit; }
-  a { color: inherit; }
 
-  header { position: sticky; top: 0; z-index: 20; background: rgba(10,10,15,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  .kente-band { height: 6px; background: var(--kente); }
+  header { position: sticky; top: 0; z-index: 20; background: rgba(11,8,6,0.9); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
   .bar { max-width: 1280px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  .logo { font-family: var(--font-head); font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
-  .logo span { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  nav { display: flex; gap: 4px; flex: 1; overflow-x: auto; }
-  nav button { background: none; border: none; padding: 8px 14px; border-radius: 8px; color: var(--muted); cursor: pointer; font-weight: 500; font-size: 14px; white-space: nowrap; }
-  nav button.active { background: var(--bg3); color: var(--text); }
-  .ghost { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 13px; }
-  .ghost:hover { border-color: var(--accent); }
+  .logo { font-family: var(--font-head); font-size: 28px; letter-spacing: 1px; text-transform: uppercase; line-height: 1; }
+  .logo span { color: var(--gold); }
+  nav { display: flex; gap: 2px; flex: 1; overflow-x: auto; }
+  nav button { background: none; border: none; padding: 8px 12px; color: var(--muted); cursor: pointer; font-family: 'Bebas Neue', sans-serif; font-size: 19px; letter-spacing: 1px; white-space: nowrap; border-bottom: 2px solid transparent; }
+  nav button.active { color: var(--cream); border-bottom-color: var(--gold); }
+  .ghost { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-block; }
+  .ghost:hover { border-color: var(--gold); }
+
+  .hero { max-width: 1280px; margin: 0 auto; padding: 36px 16px 8px; }
+  .hero h1 { font-family: var(--font-head); font-size: clamp(40px, 8vw, 84px); text-transform: uppercase; line-height: 0.95; letter-spacing: 1px; }
+  .hero h1 em { font-style: normal; color: var(--gold); }
+  .hero .tag { font-family: var(--font-tag); color: var(--red); font-size: clamp(18px, 3vw, 26px); transform: rotate(-2deg); display: inline-block; margin-top: 6px; }
+  .hero p { color: var(--muted); max-width: 640px; margin-top: 12px; line-height: 1.6; font-size: 15px; }
 
   main { max-width: 1280px; margin: 0 auto; padding: 24px 16px 60px; }
   .view { display: none; }
   .view.active { display: block; }
-  h1 { font-family: var(--font-head); font-size: 30px; margin-bottom: 4px; }
-  .sub { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+  h2.title { font-family: var(--font-head); font-size: 34px; text-transform: uppercase; letter-spacing: 1px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 4px 0 20px; line-height: 1.6; }
 
-  .studio { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
-  .panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .studio { display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: start; }
+  .panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; position: relative; overflow: hidden; }
+  .panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--kente); }
   .field { margin-bottom: 14px; }
-  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
-  textarea, input[type=text], input[type=password], input[type=number], select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+  .field label { display: block; font-size: 11px; color: var(--gold2); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  textarea, input[type=text], input[type=password], input[type=number], select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; font-size: 14px; }
   textarea { resize: vertical; min-height: 96px; line-height: 1.5; }
-  textarea:focus, input:focus, select:focus { outline: none; border-color: var(--accent); }
+  textarea:focus, input:focus, select:focus { outline: none; border-color: var(--gold); }
   .row { display: flex; gap: 8px; }
   .row > * { flex: 1; min-width: 0; }
   .seg { display: flex; flex-wrap: wrap; gap: 6px; }
-  .seg button { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; font-size: 12px; }
-  .seg button.active { border-color: var(--accent); background: rgba(168,85,247,0.15); }
-  .primary { width: 100%; background: var(--grad); border: none; border-radius: 10px; padding: 12px; font-weight: 700; font-size: 15px; cursor: pointer; color: #fff; }
+  .seg button { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 12px; }
+  .seg button.active { border-color: var(--gold); background: rgba(232,177,74,0.15); color: var(--gold2); }
+  .primary { width: 100%; background: var(--gold); border: none; border-radius: 6px; padding: 13px; font-family: var(--font-head); font-size: 18px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; color: var(--ink); }
+  .primary:hover { background: var(--gold2); }
   .primary:disabled { opacity: 0.5; cursor: not-allowed; }
-  .link-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 12px; font-weight: 600; }
+  .link-btn { background: none; border: none; color: var(--gold); cursor: pointer; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
   .link-btn:disabled { opacity: 0.5; cursor: wait; }
   .hint { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
 
-  .styles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .style-card { border: 2px solid transparent; border-radius: 10px; overflow: hidden; cursor: pointer; background: var(--bg3); padding: 0; text-align: left; }
-  .style-card.active { border-color: var(--accent); }
-  .style-card .sw { height: 38px; }
-  .style-card span { display: block; font-size: 11px; padding: 4px 6px; }
+  .styles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .style-card { border: 2px solid transparent; border-radius: 6px; overflow: hidden; cursor: pointer; background: var(--bg3); padding: 0; text-align: left; }
+  .style-card.active { border-color: var(--gold); }
+  .style-card .sw { height: 34px; }
+  .style-card span { display: block; font-size: 11px; padding: 5px 7px; font-weight: 600; }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 12px; }
-  .tile { position: relative; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-  .tile .media { width: 100%; display: block; background: var(--bg3); object-fit: cover; }
-  .tile .ph { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; text-align: center; padding: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 12px; align-items: start; }
+  .tile { position: relative; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .tile .media { width: 100%; display: block; background: var(--bg3); object-fit: cover; cursor: zoom-in; }
+  .tile .ph { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; text-align: center; padding: 16px; cursor: default; }
+  .tile .badge { position: absolute; top: 8px; left: 8px; background: rgba(11,8,6,0.8); border: 1px solid var(--gold); color: var(--gold2); border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
   .tile .meta { padding: 8px 10px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; align-items: center; }
   .tile .meta .p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .tile .actions { display: flex; gap: 4px; flex-shrink: 0; }
-  .tile .actions button, .tile .actions a { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 3px 7px; font-size: 11px; cursor: pointer; text-decoration: none; }
-  .shimmer { background: linear-gradient(90deg, var(--bg3) 25%, #23233a 50%, var(--bg3) 75%); background-size: 200% 100%; animation: sh 1.4s infinite; }
+  .tile .actions button, .tile .actions a { background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 3px 7px; font-size: 11px; cursor: pointer; text-decoration: none; }
+  .shimmer { background: linear-gradient(90deg, var(--bg3) 25%, #33261a 50%, var(--bg3) 75%); background-size: 200% 100%; animation: sh 1.4s infinite; }
   @keyframes sh { to { background-position: -200% 0; } }
-  .empty { color: var(--muted); text-align: center; padding: 60px 16px; border: 1px dashed var(--border); border-radius: 14px; font-size: 14px; }
+  .empty { color: var(--muted); text-align: center; padding: 60px 16px; border: 1px dashed var(--border); border-radius: 10px; font-size: 14px; }
+  .empty b { display: block; font-family: var(--font-tag); color: var(--gold); font-size: 22px; margin-bottom: 6px; font-weight: normal; }
+
+  .copy-card { background: var(--bg2); border: 1px solid var(--border); border-left: 4px solid var(--gold); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; font-size: 14px; line-height: 1.6; }
+  .copy-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; color: var(--gold2); margin-bottom: 4px; }
+  .copy-card ul { padding-left: 18px; }
+  .copy-card .tags { color: var(--gold); }
+  .results-tools { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 
   .char-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 12px; }
-  .char { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .char { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
   .char img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: var(--bg3); }
   .char .body { padding: 10px 12px; }
-  .char h3 { font-family: var(--font-head); font-size: 16px; }
+  .char h3 { font-family: var(--font-head); font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
   .char p { font-size: 12px; color: var(--muted); margin: 4px 0 8px; line-height: 1.5; }
 
-  .story-head { margin: 20px 0 12px; }
-  .story-head h2 { font-family: var(--font-head); font-size: 22px; }
-  .scene .cap { padding: 10px; font-size: 13px; line-height: 1.5; color: #d4d4e4; }
-  .scene .num { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.65); border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+  .story-head { margin: 0 0 14px; }
+  .story-head h3 { font-family: var(--font-head); font-size: 30px; text-transform: uppercase; }
+  .story-head p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+  .scene .cap { padding: 10px; font-size: 13px; line-height: 1.5; color: #e6dcc4; }
+  .scene .cap b { color: var(--gold2); font-weight: 600; display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
 
-  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; font-size: 13px; z-index: 50; max-width: calc(100% - 32px); display: none; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg3); border: 1px solid var(--gold); border-radius: 6px; padding: 10px 16px; font-size: 13px; z-index: 120; max-width: calc(100% - 32px); display: none; }
   .toast.err { border-color: var(--err); color: var(--err); }
 
-  dialog { margin: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; width: min(460px, calc(100% - 32px)); color: var(--text); }
-  dialog::backdrop { background: rgba(0,0,0,0.7); }
-  dialog h2 { font-family: var(--font-head); margin-bottom: 8px; }
+  dialog { margin: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; width: min(460px, calc(100% - 32px)); color: var(--cream); }
+  dialog::backdrop { background: rgba(0,0,0,0.75); }
+  dialog h2 { font-family: var(--font-head); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
   dialog p { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
-  .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
-  .dialog-actions .primary { width: auto; padding: 9px 18px; font-size: 14px; }
+  .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .dialog-actions .primary { width: auto; padding: 9px 18px; font-size: 15px; }
 
   #lightbox { width: min(1000px, calc(100% - 32px)); padding: 12px; }
-  #lightbox img { width: 100%; max-height: 75vh; object-fit: contain; border-radius: 8px; background: var(--bg3); }
+  #lightbox img { width: 100%; max-height: 72vh; object-fit: contain; border-radius: 6px; background: var(--bg3); }
   #lightbox .lb-prompt { font-size: 13px; color: var(--muted); margin: 10px 4px; line-height: 1.5; }
 
-  footer { text-align: center; color: #5a5a72; font-size: 11px; padding: 0 16px 30px; line-height: 1.6; }
+  #cover { width: min(980px, calc(100% - 32px)); }
+  .cover-wrap { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
+  #cover-canvas { width: 100%; height: auto; border-radius: 6px; background: var(--bg3); display: block; }
+
+  footer { text-align: center; color: #6f604c; font-size: 11px; padding: 0 16px 30px; line-height: 1.6; }
 
   @media (max-width: 860px) {
-    .studio { grid-template-columns: 1fr; }
+    .studio, .cover-wrap { grid-template-columns: 1fr; }
+    nav { order: 3; flex-basis: 100%; }
+    .bar { justify-content: space-between; }
   }
 </style>
 </head>
 <body>
 
 <header>
+  <div class="kente-band"></div>
   <div class="bar">
     <div class="logo">Veezy<span>.ai</span></div>
     <nav id="nav">
       <button class="active" data-view="create" type="button">Create</button>
-      <button data-view="characters" type="button">Characters</button>
-      <button data-view="story" type="button">Story</button>
-      <button data-view="library" type="button">Library</button>
+      <button data-view="characters" type="button">Artist Personas</button>
+      <button data-view="story" type="button">Video Treatment</button>
+      <button data-view="library" type="button">Vault</button>
     </nav>
     <button class="ghost" id="settings-btn" type="button">⚙ Settings</button>
   </div>
 </header>
 
+<section class="hero">
+  <h1>Visuals for <em>the culture.</em></h1>
+  <span class="tag">cover art · rollouts · video treatments</span>
+  <p>Built for independent rap and R&amp;B artists. Make cover art, promo visuals and music video storyboards that carry the roots and the grit, without paying a designer for every drop.</p>
+</section>
+
 <main>
   <!-- ─── Create ─── -->
   <section class="view active" id="view-create">
-    <h1>Create</h1>
-    <p class="sub">Type an idea, pick a style and an engine, and Veezy turns it into images.</p>
+    <h2 class="title">Create</h2>
+    <p class="sub">Describe the vibe, choose a look and a format, and Veezy makes the visuals. Then add your name and title in the cover maker.</p>
     <div class="studio">
       <div class="panel">
         <div class="field">
-          <label for="prompt">Prompt <button class="link-btn" id="enhance-btn" type="button" style="float:right">✨ Enhance with Claude</button></label>
-          <textarea id="prompt" placeholder="A neon koi fish swimming through a rainy Tokyo alley at night"></textarea>
+          <label for="prompt">The vibe <button class="link-btn" id="enhance-btn" type="button" style="float:right">✨ Art-direct it</button></label>
+          <textarea id="prompt" placeholder="Me on the hood of a '64 Impala at dusk, palm trees, smoke in the air, heavy gold chain, looking into the lens"></textarea>
         </div>
         <div class="field">
-          <label>Style</label>
+          <label>Format</label>
+          <div class="seg" id="format-seg"></div>
+          <p class="hint" id="format-hint"></p>
+        </div>
+        <div class="field">
+          <label>Look</label>
           <div class="styles" id="styles"></div>
         </div>
         <div class="field">
@@ -139,89 +182,88 @@
           <div class="seg" id="engine-seg"></div>
           <p class="hint" id="engine-hint"></p>
         </div>
-        <div class="field">
-          <label>Aspect ratio</label>
-          <div class="seg" id="aspect-seg"></div>
-        </div>
-        <div class="field row">
-          <div><label for="count">Images</label><select id="count"><option>1</option><option>2</option><option selected>4</option></select></div>
+        <div class="field row" id="count-row">
+          <div><label for="count">Variations</label><select id="count"><option>1</option><option>2</option><option selected>4</option></select></div>
           <div><label for="seed">Seed (blank = random)</label><input id="seed" type="number" min="0" placeholder="random"></div>
         </div>
         <div class="field">
-          <label for="char-select">Character (keeps them consistent)</label>
+          <label for="char-select">Artist persona</label>
           <select id="char-select"><option value="">None</option></select>
         </div>
         <div class="field">
-          <label for="negative">Avoid</label>
-          <input id="negative" type="text" placeholder="blurry, text, watermark">
+          <label for="negative">Keep out</label>
+          <input id="negative" type="text" placeholder="text, letters, watermark, blurry, extra fingers">
         </div>
-        <button class="primary" id="generate-btn" type="button">Generate</button>
+        <button class="primary" id="generate-btn" type="button">Make it</button>
       </div>
       <div>
+        <div class="results-tools"><button class="ghost" id="copy-btn" type="button">✍ Write rollout copy</button></div>
+        <div id="copy-out"></div>
         <div class="grid" id="results"></div>
-        <div class="empty" id="results-empty">Your creations will appear here.</div>
+        <div class="empty" id="results-empty"><b>The booth is open.</b>Your visuals will show up here.</div>
       </div>
     </div>
   </section>
 
-  <!-- ─── Characters ─── -->
+  <!-- ─── Personas ─── -->
   <section class="view" id="view-characters">
-    <h1>Characters</h1>
-    <p class="sub">Save a character once and reuse them in any image or story. Veezy locks in their description and seed so they look the same each time.</p>
+    <h2 class="title">Artist personas</h2>
+    <p class="sub">Save your look, or your alter ego, once. Veezy adds it to every cover, flyer and video scene so you look like you every time. Describe yourself or an original character; don't recreate other real artists.</p>
     <div class="studio">
       <div class="panel">
-        <div class="field"><label for="char-name">Name</label><input id="char-name" type="text" placeholder="Captain Mira"></div>
+        <div class="field"><label for="char-name">Stage name</label><input id="char-name" type="text" placeholder="Lil Nova"></div>
         <div class="field">
-          <label for="char-desc">Look <button class="link-btn" id="char-enhance-btn" type="button" style="float:right">✨ Flesh out with Claude</button></label>
-          <textarea id="char-desc" placeholder="Young woman, short silver hair, amber eyes, freckles, worn red pilot jacket with brass buttons"></textarea>
-          <p class="hint">Be specific about the face, hair, clothing and colors. These details are added to every prompt.</p>
+          <label for="char-desc">The look <button class="link-btn" id="char-enhance-btn" type="button" style="float:right">✨ Build it out</button></label>
+          <textarea id="char-desc" placeholder="Young Black man, deep brown skin, shoulder-length locs with gold cuffs, thin mustache, oversized vintage leather jacket, Cuban link chain"></textarea>
+          <p class="hint">Be specific about skin tone, hair, face, fit and jewelry. These details go into every prompt.</p>
         </div>
-        <button class="primary" id="char-save-btn" type="button">Create character</button>
+        <button class="primary" id="char-save-btn" type="button">Save persona</button>
       </div>
       <div>
         <div class="char-list" id="char-list"></div>
-        <div class="empty" id="char-empty">No characters yet.</div>
+        <div class="empty" id="char-empty"><b>No personas yet.</b>Add your look to keep it consistent.</div>
       </div>
     </div>
   </section>
 
-  <!-- ─── Story ─── -->
+  <!-- ─── Video treatment ─── -->
   <section class="view" id="view-story">
-    <h1>One-click story</h1>
-    <p class="sub">Write one sentence. Claude plans a storyboard and Veezy illustrates every scene.</p>
+    <h2 class="title">Video treatment</h2>
+    <p class="sub">Drop the song concept or your own hook. Claude writes a music video treatment, and Veezy storyboards every shot.</p>
     <div class="studio">
       <div class="panel">
-        <div class="field"><label for="story-idea">Story idea</label><textarea id="story-idea" placeholder="A lonely lighthouse keeper befriends a whale who can sing in human words"></textarea></div>
+        <div class="field"><label for="song-title">Song title</label><input id="song-title" type="text" placeholder="Westside Prayer"></div>
+        <div class="field"><label for="story-idea">Concept or hook</label><textarea id="story-idea" placeholder="Coming home after a long bid. The block changed but grandma's porch light is still on."></textarea></div>
         <div class="field row">
-          <div><label for="story-scenes">Scenes</label><select id="story-scenes"><option>4</option><option selected>6</option><option>8</option></select></div>
-          <div><label for="story-char">Lead character</label><select id="story-char"><option value="">Let Claude invent</option></select></div>
+          <div><label for="story-scenes">Shots</label><select id="story-scenes"><option>4</option><option selected>6</option><option>8</option></select></div>
+          <div><label for="story-char">Starring</label><select id="story-char"><option value="">Let Claude cast it</option></select></div>
         </div>
-        <div class="field"><label>Style</label><div class="styles" id="story-styles"></div></div>
-        <button class="primary" id="story-btn" type="button">Make story</button>
-        <p class="hint">Uses your Anthropic key to plan the scenes, and the engine you picked on Create to draw them.</p>
+        <div class="field"><label>Look</label><div class="styles" id="story-styles"></div></div>
+        <button class="primary" id="story-btn" type="button">Write treatment</button>
+        <p class="hint">Uses your Anthropic key to write the treatment, and the engine picked on Create to draw the shots.</p>
       </div>
-      <div id="story-out"><div class="empty">Your storyboard will appear here.</div></div>
+      <div id="story-out"><div class="empty"><b>Lights. Camera.</b>Your storyboard will show up here.</div></div>
     </div>
   </section>
 
-  <!-- ─── Library ─── -->
+  <!-- ─── Vault ─── -->
   <section class="view" id="view-library">
-    <h1>Library</h1>
+    <h2 class="title">The vault</h2>
     <p class="sub">Everything you've made, saved in this browser.</p>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="ghost" id="clear-lib" type="button">Clear library</button></div>
+    <div class="results-tools"><button class="ghost" id="clear-lib" type="button">Clear vault</button></div>
     <div class="grid" id="library"></div>
-    <div class="empty" id="library-empty">Nothing here yet. Go create something.</div>
+    <div class="empty" id="library-empty"><b>Vault's empty.</b>Go make something.</div>
   </section>
 </main>
 
-<footer>Veezy.ai Studio · Free image engine by Pollinations.ai · Planning, prompts and vector art by Claude. Don't use it to make images of real people without their consent, or of characters you don't hold the rights to.</footer>
+<footer>Veezy.ai Studio · Free image engine by Pollinations.ai · Art direction, copy and vector art by Claude.<br>Only use your own likeness or original characters. No images of real artists without their consent, and no copyrighted logos or lyrics you don't own.</footer>
 
 <div class="toast" id="toast"></div>
 
 <dialog id="settings">
   <form method="dialog">
     <h2>Settings</h2>
-    <p>The Flux and Turbo engines are free and need no key. Prompt enhancing, stories and the Vector engine use Claude: paste your Anthropic API key below. It is stored only in this browser and sent straight to Anthropic.</p>
+    <p>The Flux and Turbo engines are free and need no key. Art direction, rollout copy, video treatments and the Vector engine use Claude: paste your Anthropic API key below. It is stored only in this browser and sent straight to Anthropic.</p>
     <div class="field"><label for="api-key">Anthropic API key</label><input id="api-key" type="password" autocomplete="off" placeholder="sk-ant-..."></div>
     <div class="dialog-actions">
       <button class="ghost" value="cancel" type="submit">Cancel</button>
@@ -236,8 +278,45 @@
     <p class="lb-prompt" id="lb-prompt"></p>
     <div class="dialog-actions">
       <button class="ghost" id="lb-reuse" type="button">Reuse prompt</button>
-      <a class="ghost" id="lb-open" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Open / download</a>
+      <button class="ghost" id="lb-cover" type="button">Add title</button>
+      <a class="ghost" id="lb-open" target="_blank" rel="noopener noreferrer">Open / download</a>
       <button class="primary" value="close" type="submit">Close</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="cover">
+  <form method="dialog">
+    <h2>Cover maker</h2>
+    <div class="cover-wrap">
+      <canvas id="cover-canvas" width="1024" height="1024"></canvas>
+      <div>
+        <div class="field"><label for="cv-artist">Artist</label><input id="cv-artist" type="text" placeholder="LIL NOVA"></div>
+        <div class="field"><label for="cv-title">Title</label><input id="cv-title" type="text" placeholder="Westside Prayer"></div>
+        <div class="field row">
+          <div><label for="cv-font">Type</label>
+            <select id="cv-font">
+              <option value="Anton">Block (Anton)</option>
+              <option value="Bebas Neue">Condensed (Bebas)</option>
+              <option value="Permanent Marker">Street (Marker)</option>
+              <option value="Playfair Display">R&amp;B (Serif italic)</option>
+            </select>
+          </div>
+          <div><label for="cv-pos">Position</label>
+            <select id="cv-pos"><option value="bottom">Bottom</option><option value="top">Top</option><option value="center">Center</option></select>
+          </div>
+        </div>
+        <div class="field row">
+          <div><label for="cv-color">Color</label><input id="cv-color" type="color" value="#f3e9d2" style="width:100%;height:40px;background:none;border:1px solid var(--border);border-radius:6px"></div>
+          <div><label for="cv-size">Size</label><input id="cv-size" type="range" min="6" max="18" value="11" style="width:100%"></div>
+        </div>
+        <div class="field"><label><input id="cv-kente" type="checkbox" checked> Kente strip</label></div>
+        <div class="field"><label><input id="cv-explicit" type="checkbox"> "Explicit" tag</label></div>
+      </div>
+    </div>
+    <div class="dialog-actions">
+      <button class="ghost" value="close" type="submit">Close</button>
+      <button class="primary" id="cv-download" type="button">Download PNG</button>
     </div>
   </form>
 </dialog>
@@ -249,30 +328,36 @@ const MODEL = 'claude-opus-5-5';
 const KEYS = { apiKey: 'veezy_api_key', chars: 'veezy_characters', lib: 'veezy_library', engine: 'veezy_engine' };
 const LIB_MAX = 80;
 
+// Looks capture eras and aesthetics, never a specific real artist's likeness.
 const STYLES = [
-  { id: 'none',      name: 'None',        sw: '#2a2a3a', text: '' },
-  { id: 'photo',     name: 'Photo',       sw: 'linear-gradient(135deg,#3a4a5a,#c9b79c)', text: 'photorealistic, 35mm photograph, natural lighting, sharp focus, high detail' },
-  { id: 'cinematic', name: 'Cinematic',   sw: 'linear-gradient(135deg,#0f2027,#d97706)', text: 'cinematic film still, anamorphic lens, dramatic lighting, color graded, shallow depth of field' },
-  { id: 'anime',     name: 'Anime',       sw: 'linear-gradient(135deg,#f472b6,#60a5fa)', text: 'anime illustration, cel shading, vibrant colors, detailed background, studio quality' },
-  { id: '3d',        name: '3D Render',   sw: 'linear-gradient(135deg,#7c3aed,#22d3ee)', text: '3D render, octane, soft global illumination, stylized, pixar-like, clay materials' },
-  { id: 'watercolor',name: 'Watercolor',  sw: 'linear-gradient(135deg,#bae6fd,#fecdd3)', text: 'delicate watercolor painting, soft washes, paper texture, loose brushwork' },
-  { id: 'oil',       name: 'Oil Paint',   sw: 'linear-gradient(135deg,#78350f,#fbbf24)', text: 'oil painting, impasto brushstrokes, rich colors, classical composition' },
-  { id: 'comic',     name: 'Comic',       sw: 'linear-gradient(135deg,#facc15,#ef4444)', text: 'comic book art, bold ink lines, halftone shading, dynamic composition' },
-  { id: 'pixel',     name: 'Pixel Art',   sw: 'linear-gradient(135deg,#22c55e,#1e3a8a)', text: '16-bit pixel art, limited palette, crisp pixels, retro game aesthetic' },
+  { id: 'westcoast', name: '90s West Coast', sw: 'linear-gradient(135deg,#1e3a5f,#e8b14a 60%,#c8102e)', text: '1990s West Coast hip-hop album cover aesthetic, golden hour California light, palm trees, lowriders, bandanas, gritty 35mm film grain, warm faded colors' },
+  { id: 'goldenera', name: 'Golden Era NYC', sw: 'linear-gradient(135deg,#3b2f2f,#8b6b4a 50%,#d4c4a8)', text: '1990s East Coast boom bap album cover, brick walls, brownstone stoops, Timberland boots, black and white documentary street photography, high contrast' },
+  { id: 'kente', name: 'Kente Royalty', sw: 'repeating-linear-gradient(90deg,#e8b14a 0 10px,#c8102e 10px 18px,#1f8a4c 18px 26px,#0b0806 26px 30px)', text: 'regal portrait, kente cloth patterns, gold jewelry and crown motifs, rich red gold and green palette, Black excellence, dramatic studio lighting, editorial fashion photography' },
+  { id: 'mudcloth', name: 'Mudcloth Earth', sw: 'linear-gradient(135deg,#3a2a1c,#b5562a 55%,#e9d8b8)', text: 'earth-tone Afrocentric art direction, bogolan mudcloth textures, terracotta and ochre, natural textures, soft window light, timeless and soulful' },
+  { id: 'afrofuture', name: 'Afrofuturism', sw: 'linear-gradient(135deg,#2b0f54,#e8b14a 50%,#00c2a8)', text: 'Afrofuturist art, cosmic gold and violet palette, futuristic African armor and adornments, glowing patterns, cinematic sci-fi lighting' },
+  { id: 'rnbvelvet', name: 'R&B Velvet', sw: 'linear-gradient(135deg,#1a0b2e,#7b2d8e 55%,#ff4d8d)', text: 'moody R&B album cover, deep purple and magenta neon, silk and velvet textures, soft haze, intimate close-up, late night sensual atmosphere' },
+  { id: 'soulpaint', name: 'Soul Painting', sw: 'linear-gradient(135deg,#4a2c17,#c98a3d 50%,#2f4f3a)', text: 'oil painting portrait in the tradition of Black American figurative art, rich impasto brushwork, warm skin tones, patterned backgrounds, museum quality' },
+  { id: 'streetmural', name: 'Street Mural', sw: 'linear-gradient(135deg,#c8102e,#e8b14a 40%,#1f8a4c 80%)', text: 'hand-painted street mural, spray paint and stencil, memorial wall style, vibrant colors on cracked concrete, urban texture' },
+  { id: 'chrome', name: 'Y2K Chrome', sw: 'linear-gradient(135deg,#9aa4ad,#f5f7fa 50%,#5b6670)', text: 'late 90s / Y2K hip-hop chrome aesthetic, liquid metal, glossy reflections, fisheye lens, flashy jewelry, bold saturated colors' },
+  { id: 'none', name: 'No preset', sw: '#2b2118', text: '' },
 ];
 
 const ENGINES = [
   { id: 'flux',   name: 'Flux',   hint: 'Free and high quality, from Pollinations.ai. No key needed.' },
   { id: 'turbo',  name: 'Turbo',  hint: 'Free and fastest, from Pollinations.ai. Good for quick drafts.' },
-  { id: 'vector', name: 'Vector', hint: 'Claude draws clean, scalable SVG art. Needs your Anthropic key; best for logos, icons and flat illustration.' },
+  { id: 'vector', name: 'Vector', hint: 'Claude draws clean SVG art. Needs your Anthropic key; best for logos, merch graphics and flat illustration.' },
 ];
 
-const ASPECTS = [
-  { id: '1:1', w: 1024, h: 1024 }, { id: '4:5', w: 896, h: 1120 }, { id: '3:2', w: 1152, h: 768 },
-  { id: '16:9', w: 1280, h: 720 }, { id: '9:16', w: 720, h: 1280 },
+const FORMATS = [
+  { id: 'cover',  name: 'Cover art',    w: 1024, h: 1024, text: 'square album cover composition, strong central subject, room for a title', hint: 'Square art for an album, single or mixtape, ready for streaming services.' },
+  { id: 'story',  name: 'Story / Reel', w: 720,  h: 1280, text: 'vertical 9:16 composition, subject centered, cinematic', hint: '9:16 for Instagram Stories, Reels, TikTok and Spotify Canvas stills.' },
+  { id: 'thumb',  name: 'YouTube thumb',w: 1280, h: 720,  text: 'wide 16:9 composition, bold and readable at small sizes, high contrast', hint: '16:9 for YouTube thumbnails and visualizer backgrounds.' },
+  { id: 'flyer',  name: 'Show flyer',   w: 896,  h: 1120, text: 'concert poster composition, bold graphic layout, space at top and bottom for event text', hint: '4:5 poster for show flyers and feed posts.' },
+  { id: 'merch',  name: 'Merch graphic',w: 1024, h: 1024, text: 'screen-print t-shirt graphic, bold limited colors, isolated on plain black background, vintage rap tee style', hint: 'Tee and hoodie graphics in a vintage rap-tee style.' },
+  { id: 'pack',   name: 'Drop pack',    pack: ['cover', 'story', 'thumb', 'flyer'], hint: 'One click makes the whole rollout: cover, story, thumbnail and flyer from the same vibe and seed.' },
 ];
 
-const state = { style: 'none', storyStyle: 'cinematic', engine: 'flux', aspect: '1:1' };
+const state = { style: 'westcoast', storyStyle: 'westcoast', engine: 'flux', format: 'cover' };
 
 // ─── Utilities ──────────────────────────────────────────────────────────────
 const $ = (id) => document.getElementById(id);
@@ -283,6 +368,7 @@ const store = {
 };
 const randSeed = () => Math.floor(Math.random() * 2_000_000_000);
 const uid = () => Math.random().toString(36).slice(2, 10);
+const formatById = (id) => FORMATS.find(f => f.id === id) || FORMATS[0];
 
 let toastTimer;
 function toast(msg, isErr = false) {
@@ -330,38 +416,58 @@ async function askClaude({ system, prompt, effort = 'low', maxTokens = 4000, sch
   return schema ? JSON.parse(text) : text;
 }
 
-const enhancePrompt = (idea) => askClaude({
-  system: 'You write prompts for text-to-image models. Expand the idea into one vivid prompt of 40-70 words covering subject, setting, composition, lighting, mood and color. Output only the prompt text, with no quotes or preamble.',
+const CULTURE = 'You work with independent Black rap and R&B artists. Your art direction is rooted in African and African American visual culture (1990s hip-hop album art, soul and R&B photography, Afrocentric textiles and adornment) with a modern, premium finish. Never reference or imitate a specific real person\'s likeness; capture eras and aesthetics instead.';
+
+const enhancePrompt = (idea, format) => askClaude({
+  system: `${CULTURE} Expand the artist's idea into one vivid text-to-image prompt of 40-70 words for a ${format}: subject, wardrobe, setting, composition, lighting, film or lens, mood and color palette. Do not ask the image model to render any text or logos. Output only the prompt.`,
   prompt: idea,
 });
 
 const fleshOutCharacter = (name, desc) => askClaude({
-  system: 'You design consistent characters for image generation. Write a single 30-60 word visual description that fixes face, age, hair, eyes, build, outfit and signature colors, so the character looks the same in every image. Output only the description.',
-  prompt: `Name: ${name || 'unnamed'}\nNotes: ${desc || 'invent an interesting original character'}`,
+  system: `${CULTURE} Write a single 30-60 word visual description of this artist persona for image generation, fixing skin tone, age, hair, face, build, signature fit and jewelry so they look the same in every image. Output only the description.`,
+  prompt: `Stage name: ${name || 'unnamed'}\nNotes: ${desc || 'invent an original artist persona'}`,
+});
+
+const COPY_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['caption', 'hashtags', 'post_ideas'],
+  properties: {
+    caption: { type: 'string' },
+    hashtags: { type: 'array', items: { type: 'string' } },
+    post_ideas: { type: 'array', items: { type: 'string' } },
+  },
+};
+
+const writeRolloutCopy = (vibe, persona) => askClaude({
+  system: `${CULTURE} Write release-day social copy that sounds like the artist, not a marketer: confident, culturally fluent, no cringe slang. caption is under 220 characters. hashtags is 8-12 tags without the # sign, mixing genre, scene and discovery tags. post_ideas is 3 short ideas for rollout content in the week around the drop.`,
+  prompt: `Artist: ${persona?.name || 'independent artist'}\nVisual vibe of the release: ${vibe}`,
+  schema: COPY_SCHEMA,
 });
 
 const STORY_SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['title', 'lead_description', 'scenes'],
+  required: ['title', 'logline', 'lead_description', 'scenes'],
   properties: {
     title: { type: 'string' },
+    logline: { type: 'string' },
     lead_description: { type: 'string' },
     scenes: {
       type: 'array',
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['caption', 'image_prompt'],
-        properties: { caption: { type: 'string' }, image_prompt: { type: 'string' } },
+        required: ['moment', 'direction', 'image_prompt'],
+        properties: { moment: { type: 'string' }, direction: { type: 'string' }, image_prompt: { type: 'string' } },
       },
     },
   },
 };
 
-const planStory = (idea, scenes, lead) => askClaude({
-  system: 'You are a storyboard artist. Turn the idea into a short illustrated story with a clear beginning, rising tension and a satisfying ending. Each caption is one or two sentences of narration. Each image_prompt describes only what is visible in that frame (action, setting, camera angle, lighting) in under 50 words. Do not repeat the lead character\'s appearance in image_prompt; it is added automatically. lead_description is a 30-50 word fixed visual description of the main character.',
-  prompt: `Idea: ${idea}\nNumber of scenes: ${scenes}\n${lead ? `Lead character (use this exact look for lead_description): ${lead}` : 'Invent the lead character.'}`,
+const planTreatment = (song, idea, scenes, lead) => askClaude({
+  system: `${CULTURE} You are a music video director writing a treatment. Give it a clear arc. For each shot: moment is a 2-5 word label (e.g. "Verse 1: the block"), direction is one or two sentences of camera, performance and edit notes, and image_prompt describes only what is visible in that frame (action, location, angle, light) in under 50 words. Do not describe the lead artist's appearance in image_prompt; it is added automatically. Do not quote song lyrics. lead_description is a 30-50 word fixed visual description of the lead artist.`,
+  prompt: `Song: ${song || 'untitled'}\nConcept: ${idea}\nNumber of shots: ${scenes}\n${lead ? `Lead artist (use this exact look for lead_description): ${lead}` : 'Cast an original lead artist.'}`,
   effort: 'medium',
   maxTokens: 16000,
   schema: STORY_SCHEMA,
@@ -369,7 +475,7 @@ const planStory = (idea, scenes, lead) => askClaude({
 
 async function drawVector(prompt, w, h) {
   const text = await askClaude({
-    system: `You are a vector illustrator. Draw the requested scene as a single standalone SVG with viewBox="0 0 ${w} ${h}". Use rich flat shapes, gradients and layering; no external images, fonts, scripts or links. Output only the SVG markup.`,
+    system: `${CULTURE} You are a vector illustrator. Draw the requested artwork as a single standalone SVG with viewBox="0 0 ${w} ${h}". Use bold flat shapes, gradients, layering and Afrocentric pattern details; no external images, fonts, scripts or links. Output only the SVG markup.`,
     prompt,
     effort: 'medium',
     maxTokens: 32000,
@@ -387,25 +493,31 @@ function pollinationsUrl(prompt, { w, h, seed, model, negative }) {
   return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?${params}`;
 }
 
-function composePrompt(base, styleId, character) {
+function composePrompt(base, styleId, character, formatText) {
   const style = STYLES.find(s => s.id === styleId)?.text;
-  return [character ? `${character.name}: ${character.desc}` : '', base, style].filter(Boolean).join(', ');
+  return [character ? `${character.name}: ${character.desc}` : '', base, formatText, style].filter(Boolean).join(', ');
 }
 
-// Resolves to an image src (URL or data URI). Pollinations URLs are validated by loading them.
-async function renderImage(prompt, opts) {
-  if (opts.engine === 'vector') return drawVector(prompt, opts.w, opts.h);
-  const src = pollinationsUrl(prompt, { ...opts, model: opts.engine });
-  await new Promise((resolve, reject) => {
+// Loads with CORS so the cover maker can draw the result onto a canvas.
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = resolve;
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
     img.onerror = () => reject(new Error('The image engine failed. Try again or switch engines.'));
     img.src = src;
   });
+}
+
+// Resolves to an image src (URL or data URI).
+async function renderImage(prompt, opts) {
+  if (opts.engine === 'vector') return drawVector(prompt, opts.w, opts.h);
+  const src = pollinationsUrl(prompt, { ...opts, model: opts.engine });
+  await loadImage(src);
   return src;
 }
 
-// ─── Library ────────────────────────────────────────────────────────────────
+// ─── Vault ──────────────────────────────────────────────────────────────────
 function saveToLibrary(item) {
   const lib = store.get(KEYS.lib, []);
   lib.unshift(item);
@@ -414,13 +526,15 @@ function saveToLibrary(item) {
 }
 
 function tileHTML(item, { removable = false } = {}) {
-  const ratio = (ASPECTS.find(a => a.id === item.aspect) || ASPECTS[0]);
+  const f = formatById(item.format);
   return `
   <div class="tile" data-id="${esc(item.id)}">
-    <img class="media" src="${esc(item.src)}" alt="${esc(item.prompt)}" style="aspect-ratio:${ratio.w}/${ratio.h}" loading="lazy" data-open>
+    <img class="media" src="${esc(item.src)}" alt="${esc(item.prompt)}" style="aspect-ratio:${f.w}/${f.h}" loading="lazy" crossorigin="anonymous" data-open>
+    <span class="badge">${esc(f.name)}</span>
     <div class="meta">
-      <span class="p" title="${esc(item.prompt)}">${esc(item.engine)} · ${esc(item.prompt)}</span>
+      <span class="p" title="${esc(item.prompt)}">${esc(item.base || item.prompt)}</span>
       <span class="actions">
+        <button data-cover type="button" title="Add title">Aa</button>
         <a href="${esc(item.src)}" target="_blank" rel="noopener noreferrer" ${item.src.startsWith('data:') ? `download="veezy-${esc(item.id)}.svg"` : ''}>↓</a>
         ${removable ? '<button data-remove type="button">✕</button>' : ''}
       </span>
@@ -434,14 +548,14 @@ function renderLibrary() {
   $('library-empty').style.display = lib.length ? 'none' : 'block';
 }
 
-// ─── Characters ─────────────────────────────────────────────────────────────
+// ─── Personas ───────────────────────────────────────────────────────────────
 const getChars = () => store.get(KEYS.chars, []);
 
 function renderCharacters() {
   const chars = getChars();
   $('char-list').innerHTML = chars.map(c => `
     <div class="char" data-id="${esc(c.id)}">
-      <img src="${esc(pollinationsUrl(composePrompt('portrait, head and shoulders, neutral background', 'none', c), { w: 512, h: 512, seed: c.seed, model: 'flux' }))}" alt="${esc(c.name)}" loading="lazy">
+      <img src="${esc(pollinationsUrl(composePrompt('editorial press photo, head and shoulders, warm studio backdrop', 'mudcloth', c), { w: 512, h: 512, seed: c.seed, model: 'flux' }))}" alt="${esc(c.name)}" loading="lazy">
       <div class="body">
         <h3>${esc(c.name)}</h3>
         <p>${esc(c.desc)}</p>
@@ -456,7 +570,7 @@ function renderCharacters() {
   const options = '<option value="">None</option>' + chars.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
   const keep1 = $('char-select').value, keep2 = $('story-char').value;
   $('char-select').innerHTML = options;
-  $('story-char').innerHTML = options.replace('>None<', '>Let Claude invent<');
+  $('story-char').innerHTML = options.replace('>None<', '>Let Claude cast it<');
   $('char-select').value = chars.some(c => c.id === keep1) ? keep1 : '';
   $('story-char').value = chars.some(c => c.id === keep2) ? keep2 : '';
 }
@@ -464,78 +578,80 @@ function renderCharacters() {
 // ─── Create flow ────────────────────────────────────────────────────────────
 async function generate() {
   const base = $('prompt').value.trim();
-  if (!base) return toast('Write a prompt first.', true);
+  if (!base) return toast('Describe the vibe first.', true);
   const character = getChars().find(c => c.id === $('char-select').value);
-  const aspect = ASPECTS.find(a => a.id === state.aspect);
-  const count = Number($('count').value);
+  const fmt = formatById(state.format);
   const fixedSeed = $('seed').value === '' ? null : Number($('seed').value);
-  const prompt = composePrompt(base, state.style, character);
   const negative = $('negative').value.trim();
+
+  // A drop pack makes one of each format from the same seed; otherwise N variations of one format.
+  const jobs = fmt.pack
+    ? fmt.pack.map(id => ({ f: formatById(id), seed: fixedSeed ?? character?.seed ?? null }))
+    : Array.from({ length: Number($('count').value) }, (_, i) => ({ f: fmt, seed: fixedSeed != null ? fixedSeed + i : character ? character.seed + i : null }));
+  const packSeed = randSeed();
 
   const btn = $('generate-btn');
   btn.disabled = true;
-  btn.textContent = 'Generating…';
+  btn.textContent = 'Cooking…';
   $('results-empty').style.display = 'none';
 
-  const jobs = Array.from({ length: count }, (_, i) => {
-    const seed = fixedSeed != null ? fixedSeed + i : character ? character.seed + i : randSeed();
-    const id = uid();
+  await Promise.all(jobs.map(({ f, seed }) => {
+    const s = seed ?? (fmt.pack ? packSeed : randSeed());
+    const prompt = composePrompt(base, state.style, character, f.text);
     const ph = document.createElement('div');
     ph.className = 'tile';
-    ph.innerHTML = `<div class="media ph shimmer" style="aspect-ratio:${aspect.w}/${aspect.h}">Creating…</div>`;
+    ph.innerHTML = `<div class="media ph shimmer" style="aspect-ratio:${f.w}/${f.h}">Cooking ${esc(f.name.toLowerCase())}…</div>`;
     $('results').prepend(ph);
-    return renderImage(prompt, { engine: state.engine, w: aspect.w, h: aspect.h, seed, negative })
+    return renderImage(prompt, { engine: state.engine, w: f.w, h: f.h, seed: s, negative })
       .then(src => {
-        const item = { id, src, prompt, base, engine: state.engine, aspect: state.aspect, seed, ts: Date.now() };
+        const item = { id: uid(), src, prompt, base, engine: state.engine, format: f.id, seed: s, ts: Date.now() };
         saveToLibrary(item);
         ph.outerHTML = tileHTML(item);
       })
       .catch(err => {
-        ph.innerHTML = `<div class="media ph" style="aspect-ratio:${aspect.w}/${aspect.h};color:var(--err)">${esc(errorMessage(err))}</div>`;
+        ph.innerHTML = `<div class="media ph" style="aspect-ratio:${f.w}/${f.h};color:var(--err)">${esc(errorMessage(err))}</div>`;
       });
-  });
+  }));
 
-  await Promise.all(jobs);
   btn.disabled = false;
-  btn.textContent = 'Generate';
+  btn.textContent = 'Make it';
 }
 
-// ─── Story flow ─────────────────────────────────────────────────────────────
-async function makeStory() {
+// ─── Video treatment flow ───────────────────────────────────────────────────
+async function makeTreatment() {
   const idea = $('story-idea').value.trim();
-  if (!idea) return toast('Write a story idea first.', true);
+  if (!idea) return toast('Drop the concept or hook first.', true);
   const chosen = getChars().find(c => c.id === $('story-char').value);
   const btn = $('story-btn');
   const out = $('story-out');
   btn.disabled = true;
-  btn.textContent = 'Planning storyboard…';
-  out.innerHTML = '<div class="empty shimmer">Claude is writing your storyboard…</div>';
+  btn.textContent = 'Writing treatment…';
+  out.innerHTML = '<div class="empty shimmer"><b>In the writers\' room…</b>Claude is writing your treatment.</div>';
 
   try {
-    const plan = await planStory(idea, Number($('story-scenes').value), chosen?.desc);
-    const lead = chosen || { name: 'the hero', desc: plan.lead_description, seed: randSeed() };
-    const aspect = ASPECTS.find(a => a.id === '16:9');
-    btn.textContent = 'Illustrating scenes…';
+    const plan = await planTreatment($('song-title').value.trim(), idea, Number($('story-scenes').value), chosen?.desc);
+    const lead = chosen || { name: 'the artist', desc: plan.lead_description, seed: randSeed() };
+    const f = formatById('thumb');
+    btn.textContent = 'Storyboarding…';
 
     out.innerHTML = `
-      <div class="story-head"><h2>${esc(plan.title)}</h2><p class="sub">${esc(lead.desc)}</p></div>
+      <div class="story-head"><h3>${esc(plan.title)}</h3><p>${esc(plan.logline)}</p></div>
       <div class="grid" id="story-grid">${plan.scenes.map((s, i) => `
         <div class="tile scene">
-          <div class="media ph shimmer" style="aspect-ratio:16/9" data-scene="${i}">Scene ${i + 1}…</div>
-          <span class="num">${i + 1}</span>
-          <div class="cap">${esc(s.caption)}</div>
+          <div class="media ph shimmer" style="aspect-ratio:16/9" data-scene="${i}">Shot ${i + 1}…</div>
+          <span class="badge">Shot ${i + 1}</span>
+          <div class="cap"><b>${esc(s.moment)}</b>${esc(s.direction)}</div>
         </div>`).join('')}
       </div>`;
 
     await Promise.all(plan.scenes.map(async (s, i) => {
       const slot = out.querySelector(`[data-scene="${i}"]`);
-      const prompt = composePrompt(s.image_prompt, state.storyStyle, lead);
+      const prompt = composePrompt(s.image_prompt, state.storyStyle, lead, 'cinematic music video still, widescreen');
       try {
-        // Same seed across scenes keeps the lead's look as consistent as the engine allows.
-        const src = await renderImage(prompt, { engine: state.engine, w: aspect.w, h: aspect.h, seed: lead.seed });
-        const item = { id: uid(), src, prompt, base: s.image_prompt, engine: state.engine, aspect: '16:9', seed: lead.seed, ts: Date.now(), story: plan.title };
-        saveToLibrary(item);
-        slot.outerHTML = `<img class="media" src="${esc(src)}" alt="${esc(s.caption)}" style="aspect-ratio:16/9" data-open data-prompt="${esc(prompt)}">`;
+        // Same seed across shots keeps the lead's look as consistent as the engine allows.
+        const src = await renderImage(prompt, { engine: state.engine, w: f.w, h: f.h, seed: lead.seed });
+        saveToLibrary({ id: uid(), src, prompt, base: `${plan.title}: ${s.moment}`, engine: state.engine, format: 'thumb', seed: lead.seed, ts: Date.now() });
+        slot.outerHTML = `<img class="media" src="${esc(src)}" alt="${esc(s.moment)}" style="aspect-ratio:16/9" crossorigin="anonymous" data-open data-prompt="${esc(prompt)}">`;
       } catch (err) {
         slot.classList.remove('shimmer');
         slot.style.color = 'var(--err)';
@@ -546,14 +662,107 @@ async function makeStory() {
     out.innerHTML = `<div class="empty" style="color:var(--err)">${esc(errorMessage(err))}</div>`;
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Make story';
+    btn.textContent = 'Write treatment';
   }
 }
+
+// ─── Cover maker ────────────────────────────────────────────────────────────
+const cover = { img: null };
+
+function drawCover() {
+  const canvas = $('cover-canvas');
+  const ctx = canvas.getContext('2d');
+  const img = cover.img;
+  const w = 1024;
+  const h = Math.round(w * (img.naturalHeight || img.height || 1) / (img.naturalWidth || img.width || 1));
+  canvas.width = w;
+  canvas.height = h;
+  ctx.drawImage(img, 0, 0, w, h);
+
+  const artist = $('cv-artist').value.trim();
+  const title = $('cv-title').value.trim();
+  const font = $('cv-font').value;
+  const pos = $('cv-pos').value;
+  const size = Math.round(w * Number($('cv-size').value) / 100);
+  const italic = font === 'Playfair Display' ? 'italic 700 ' : '';
+  const kenteH = $('cv-kente').checked ? Math.round(h * 0.022) : 0;
+
+  if (artist || title) {
+    // Scrim behind the text so it reads on any image.
+    const band = size * 2.6;
+    const y0 = pos === 'top' ? 0 : pos === 'center' ? h / 2 - band / 2 : h - band - kenteH;
+    const g = ctx.createLinearGradient(0, y0, 0, y0 + band);
+    const dark = 'rgba(0,0,0,0.6)', clear = 'rgba(0,0,0,0)';
+    if (pos === 'top') { g.addColorStop(0, dark); g.addColorStop(1, clear); }
+    else if (pos === 'bottom') { g.addColorStop(0, clear); g.addColorStop(1, dark); }
+    else { g.addColorStop(0, clear); g.addColorStop(0.5, dark); g.addColorStop(1, clear); }
+    ctx.fillStyle = g;
+    ctx.fillRect(0, y0, w, band);
+
+    ctx.fillStyle = $('cv-color').value;
+    ctx.textAlign = 'center';
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+    ctx.shadowBlur = size * 0.15;
+    const upper = font === 'Playfair Display' ? (s) => s : (s) => s.toUpperCase();
+    const fit = (text, px, f) => {
+      let p = px;
+      do { ctx.font = `${f}${p}px "${font}"`; p -= 2; } while (ctx.measureText(text).width > w * 0.9 && p > 10);
+    };
+    const base = pos === 'top' ? size * 1.15 : pos === 'center' ? h / 2 - size * 0.1 : h - kenteH - size * 0.95;
+    if (artist) { fit(upper(artist), size, italic); ctx.fillText(upper(artist), w / 2, base); }
+    if (title) { fit(upper(title), Math.round(size * 0.5), italic); ctx.fillText(upper(title), w / 2, base + size * 0.62); }
+    ctx.shadowBlur = 0;
+  }
+
+  if (kenteH) {
+    const colors = ['#e8b14a', '#0b0806', '#c8102e', '#0b0806', '#1f8a4c', '#0b0806', '#e8b14a', '#b5562a'];
+    const widths = [18, 4, 12, 4, 14, 4, 6, 10];
+    let x = 0, i = 0;
+    while (x < w) { ctx.fillStyle = colors[i % 8]; ctx.fillRect(x, h - kenteH, widths[i % 8] * 2, kenteH); x += widths[i % 8] * 2; i++; }
+  }
+
+  if ($('cv-explicit').checked) {
+    const bw = w * 0.17, bh = w * 0.05, bx = w - bw - w * 0.03, by = h - bh - kenteH - w * 0.03;
+    ctx.fillStyle = '#000'; ctx.fillRect(bx, by, bw, bh);
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.strokeRect(bx + 4, by + 4, bw - 8, bh - 8);
+    ctx.fillStyle = '#fff'; ctx.font = `${Math.round(bh * 0.5)}px "Anton"`; ctx.textAlign = 'center';
+    ctx.fillText('EXPLICIT', bx + bw / 2, by + bh * 0.68);
+  }
+}
+
+async function openCoverMaker(src) {
+  try {
+    await Promise.all(['Anton', 'Bebas Neue', 'Permanent Marker', 'italic 700 1em "Playfair Display"']
+      .map(f => document.fonts.load(f.includes('"') ? f : `1em "${f}"`)));
+    cover.img = await loadImage(src);
+  } catch (err) {
+    return toast(errorMessage(err), true);
+  }
+  if (lightbox.open) lightbox.close();
+  const persona = getChars().find(c => c.id === $('char-select').value);
+  if (persona && !$('cv-artist').value) $('cv-artist').value = persona.name;
+  drawCover();
+  $('cover').showModal();
+}
+
+['cv-artist', 'cv-title', 'cv-font', 'cv-pos', 'cv-color', 'cv-size', 'cv-kente', 'cv-explicit']
+  .forEach(id => $(id).addEventListener('input', () => cover.img && drawCover()));
+
+$('cv-download').addEventListener('click', () => {
+  try {
+    const a = document.createElement('a');
+    a.href = $('cover-canvas').toDataURL('image/png');
+    a.download = `veezy-cover-${($('cv-title').value || 'untitled').replace(/[^\w-]+/g, '-').toLowerCase()}.png`;
+    a.click();
+  } catch {
+    toast('This image can\'t be exported from the browser. Open it and save it instead.', true);
+  }
+});
 
 // ─── Wiring ─────────────────────────────────────────────────────────────────
 function segmented(containerId, items, key, onChange) {
   const el = $(containerId);
-  el.innerHTML = items.map(it => `<button type="button" data-id="${it.id}" class="${state[key] === it.id ? 'active' : ''}">${it.name || it.id}</button>`).join('');
+  el.innerHTML = items.map(it => `<button type="button" data-id="${it.id}" class="${state[key] === it.id ? 'active' : ''}">${it.name}</button>`).join('');
   el.addEventListener('click', (e) => {
     const b = e.target.closest('button');
     if (!b) return;
@@ -576,11 +785,17 @@ function stylePicker(containerId, key) {
 
 state.engine = ENGINES.some(e => e.id === store.get(KEYS.engine)) ? store.get(KEYS.engine) : 'flux';
 const updateEngineHint = () => { $('engine-hint').textContent = ENGINES.find(e => e.id === state.engine).hint; store.set(KEYS.engine, state.engine); };
+const updateFormatHint = () => {
+  const f = formatById(state.format);
+  $('format-hint').textContent = f.hint;
+  $('count-row').style.display = f.pack ? 'none' : '';
+};
 segmented('engine-seg', ENGINES, 'engine', updateEngineHint);
-segmented('aspect-seg', ASPECTS, 'aspect');
+segmented('format-seg', FORMATS, 'format', updateFormatHint);
 stylePicker('styles', 'style');
 stylePicker('story-styles', 'storyStyle');
 updateEngineHint();
+updateFormatHint();
 
 $('nav').addEventListener('click', (e) => {
   const b = e.target.closest('button');
@@ -592,7 +807,7 @@ $('nav').addEventListener('click', (e) => {
 const goTo = (view) => document.querySelector(`#nav [data-view="${view}"]`).click();
 
 $('generate-btn').addEventListener('click', generate);
-$('story-btn').addEventListener('click', makeStory);
+$('story-btn').addEventListener('click', makeTreatment);
 
 async function withBusy(btn, label, fn) {
   const old = btn.textContent;
@@ -602,26 +817,38 @@ async function withBusy(btn, label, fn) {
   finally { btn.disabled = false; btn.textContent = old; }
 }
 
-$('enhance-btn').addEventListener('click', (e) => withBusy(e.currentTarget, 'Enhancing…', async () => {
+$('enhance-btn').addEventListener('click', (e) => withBusy(e.currentTarget, 'Directing…', async () => {
   const idea = $('prompt').value.trim();
-  if (!idea) throw new Error('Write a short idea first.');
-  $('prompt').value = await enhancePrompt(idea);
+  if (!idea) throw new Error('Describe the vibe first.');
+  $('prompt').value = await enhancePrompt(idea, formatById(state.format).name.toLowerCase());
 }));
 
-$('char-enhance-btn').addEventListener('click', (e) => withBusy(e.currentTarget, 'Writing…', async () => {
+$('copy-btn').addEventListener('click', (e) => withBusy(e.currentTarget, 'Writing…', async () => {
+  const vibe = $('prompt').value.trim();
+  if (!vibe) throw new Error('Describe the vibe first.');
+  const copy = await writeRolloutCopy(vibe, getChars().find(c => c.id === $('char-select').value));
+  $('copy-out').innerHTML = `
+    <div class="copy-card">
+      <h3>Caption</h3><p>${esc(copy.caption)}</p>
+      <h3 style="margin-top:10px">Hashtags</h3><p class="tags">${copy.hashtags.map(t => '#' + esc(String(t).replace(/^#/, ''))).join(' ')}</p>
+      <h3 style="margin-top:10px">Rollout ideas</h3><ul>${copy.post_ideas.map(p => `<li>${esc(p)}</li>`).join('')}</ul>
+    </div>`;
+}));
+
+$('char-enhance-btn').addEventListener('click', (e) => withBusy(e.currentTarget, 'Building…', async () => {
   $('char-desc').value = await fleshOutCharacter($('char-name').value.trim(), $('char-desc').value.trim());
 }));
 
 $('char-save-btn').addEventListener('click', () => {
   const name = $('char-name').value.trim();
   const desc = $('char-desc').value.trim();
-  if (!name || !desc) return toast('Give the character a name and a look.', true);
+  if (!name || !desc) return toast('Give the persona a stage name and a look.', true);
   const chars = getChars();
   chars.unshift({ id: uid(), name, desc, seed: randSeed() });
   store.set(KEYS.chars, chars);
   $('char-name').value = $('char-desc').value = '';
   renderCharacters();
-  toast(`${name} is ready to use.`);
+  toast(`${name} is locked in.`);
 });
 
 $('char-list').addEventListener('click', (e) => {
@@ -636,9 +863,11 @@ $('char-list').addEventListener('click', (e) => {
   }
 });
 
-// Lightbox for any image marked data-open
+// Lightbox for any image marked data-open; "Aa" buttons on tiles open the cover maker.
 const lightbox = $('lightbox');
 document.addEventListener('click', (e) => {
+  const coverBtn = e.target.closest('[data-cover]');
+  if (coverBtn) return openCoverMaker(coverBtn.closest('.tile').querySelector('img').src);
   const img = e.target.closest('img[data-open]');
   if (!img) return;
   const prompt = img.dataset.prompt || img.alt;
@@ -653,6 +882,7 @@ $('lb-reuse').addEventListener('click', () => {
   lightbox.close();
   goTo('create');
 });
+$('lb-cover').addEventListener('click', () => openCoverMaker($('lb-img').src));
 
 $('library').addEventListener('click', (e) => {
   if (!e.target.closest('[data-remove]')) return;
@@ -661,7 +891,7 @@ $('library').addEventListener('click', (e) => {
   renderLibrary();
 });
 $('clear-lib').addEventListener('click', () => {
-  if (!confirm('Delete everything in your library?')) return;
+  if (!confirm('Delete everything in your vault?')) return;
   store.set(KEYS.lib, []);
   renderLibrary();
 });
