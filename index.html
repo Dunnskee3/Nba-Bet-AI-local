@@ -3,82 +3,129 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Courtside Skeptic v3.5 — AI NBA</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Space+Mono&family=Bebas+Neue&display=swap" rel="stylesheet">
+<title>Veezy.ai — AI NBA Edge</title>
+<meta name="description" content="Veezy.ai: AI-graded NBA lines, picks and edges for today's slate.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Archivo+Black&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #06060e; --bg2: #0d0d1c; --bg3: #12122a;
-    --card: #0f0f20; --card-border: #1e1e3f;
-    --cyan: #00e5ff; --green: #00ff87; --gold: #ffd700;
-    --red: #ff3366; --text: #e0e0ff;
-    --font-head: 'Bebas Neue', sans-serif;
-    --font-data: 'Space Mono', monospace;
-    --font-ui: 'Rajdhani', sans-serif;
+    --bg: #07070b; --bg2: #0e0e16; --bg3: #151520;
+    --card: #101018; --border: #23233a;
+    --violet: #8b5cf6; --lime: #c6ff3d; --cyan: #38e1ff;
+    --gold: #ffcc4d; --red: #ff4d6d; --green: #34f5a0;
+    --text: #ececf6; --muted: #8a8aa8;
+    --font-head: 'Archivo Black', sans-serif;
+    --font-data: 'JetBrains Mono', monospace;
+    --font-ui: 'Inter', sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: var(--font-ui); min-height: 100vh; overflow-x: hidden; }
-  body::after { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0,229,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.02) 1px, transparent 1px); background-size: 40px 40px; z-index: 0; pointer-events: none; }
+  body::before { content: ''; position: fixed; inset: -20% -10% auto auto; width: 70vw; height: 70vw; background: radial-gradient(circle, rgba(139,92,246,0.14), transparent 60%); z-index: 0; pointer-events: none; }
+  button { font-family: inherit; }
 
-  header { position: relative; z-index: 10; padding: 20px; border-bottom: 1px solid var(--card-border); background: linear-gradient(180deg, rgba(0,229,255,0.05), transparent); }
-  .logo-text { font-family: var(--font-head); font-size: 40px; letter-spacing: 3px; color: #fff; text-shadow: 0 0 20px var(--cyan); text-align: center; margin-bottom: 20px;}
-  
-  .top-ui { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 10px; }
-  .stat-box { background: var(--bg3); border: 1px solid var(--card-border); padding: 10px 20px; border-radius: 4px; min-width: 120px; text-align: left;}
-  .stat-label { font-size: 11px; color: var(--text); opacity: 0.6; text-transform: uppercase; font-family: var(--font-data); }
-  .stat-val { font-family: var(--font-head); font-size: 24px; color: #fff; display: block; margin-top: 5px; }
+  header { position: relative; z-index: 10; padding: 20px 16px 12px; border-bottom: 1px solid var(--border); }
+  .brand-row { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto 16px; gap: 12px; }
+  .logo { font-family: var(--font-head); font-size: 34px; letter-spacing: -1px; color: #fff; }
+  .logo .dot { color: var(--lime); }
+  .logo .ai { background: linear-gradient(90deg, var(--violet), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tagline { font-size: 12px; color: var(--muted); font-family: var(--font-data); }
+  .icon-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 13px; }
+  .icon-btn:hover { border-color: var(--violet); }
 
-  .refresh-btn { background: var(--cyan); color: #000; border: none; padding: 0 25px; font-family: var(--font-head); font-size: 20px; cursor: pointer; border-radius: 4px; text-transform: uppercase; height: 65px; transition: 0.2s; font-weight: bold; }
-  .refresh-btn:hover { background: #fff; box-shadow: 0 0 20px var(--cyan); }
-  .refresh-btn:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
+  .top-ui { display: flex; gap: 12px; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; }
+  .stat-box { flex: 1 1 120px; background: var(--bg2); border: 1px solid var(--border); padding: 10px 14px; border-radius: 10px; }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-family: var(--font-data); }
+  .stat-val { font-family: var(--font-head); font-size: 22px; color: #fff; display: block; margin-top: 4px; }
+  .refresh-btn { flex: 0 0 auto; background: var(--lime); color: #000; border: none; padding: 0 22px; font-family: var(--font-head); font-size: 15px; cursor: pointer; border-radius: 10px; min-height: 58px; transition: 0.2s; }
+  .refresh-btn:hover { box-shadow: 0 0 24px rgba(198,255,61,0.45); }
+  .refresh-btn:disabled { background: #2a2a38; color: #666; cursor: not-allowed; box-shadow: none; }
 
-  main { position: relative; z-index: 10; padding: 20px; max-width: 1200px; margin: 0 auto; }
-  #games-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; max-width: 1200px; margin: 14px auto 0; }
+  .chip { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 6px 12px; border-radius: 999px; cursor: pointer; font-size: 12px; font-family: var(--font-data); }
+  .chip.active { background: var(--violet); border-color: var(--violet); color: #fff; }
+  .last-sync { text-align: center; font-family: var(--font-data); font-size: 11px; color: #55556e; padding-top: 10px; }
 
-  .game-card { background: var(--card); border: 1px solid var(--card-border); border-radius: 8px; padding: 18px; }
-  .matchup { font-family: var(--font-head); font-size: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  main { position: relative; z-index: 10; padding: 20px 16px 40px; max-width: 1200px; margin: 0 auto; }
+  #games-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 16px; }
+
+  .game-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; }
+  .game-card.top { border-color: rgba(198,255,61,0.5); box-shadow: 0 0 0 1px rgba(198,255,61,0.15), 0 10px 30px -15px rgba(198,255,61,0.35); }
+  .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .tip { font-family: var(--font-data); font-size: 11px; color: var(--muted); }
+  .matchup { font-weight: 700; font-size: 17px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
   .team-name { flex: 1; }
-  .team-name.away { text-align: left; }
   .team-name.home { text-align: right; }
+  .at { color: var(--gold); font-size: 14px; }
 
-  .odds-row { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
-  .odds-chip { flex: 1; background: var(--bg3); border: 1px solid var(--card-border); border-radius: 4px; padding: 8px; text-align: center; }
-  .odds-chip .label { font-size: 10px; color: var(--text); opacity: 0.5; font-family: var(--font-data); display: block; margin-bottom: 4px; text-transform: uppercase; }
-  .odds-chip .val { font-family: var(--font-data); font-size: 14px; color: var(--cyan); }
+  .odds-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+  .odds-chip { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 7px 4px; text-align: center; min-width: 0; }
+  .odds-chip .label { font-size: 9px; color: var(--muted); font-family: var(--font-data); display: block; margin-bottom: 3px; text-transform: uppercase; }
+  .odds-chip .val { font-family: var(--font-data); font-size: 13px; color: var(--cyan); overflow-wrap: anywhere; }
   .odds-chip .val.pos { color: var(--green); }
   .odds-chip .val.neg { color: var(--red); }
+  .odds-chip .sub { display: block; font-size: 9px; color: var(--muted); font-family: var(--font-data); margin-top: 2px; }
+  .market-note { font-family: var(--font-data); font-size: 10px; color: var(--muted); margin-bottom: 10px; }
 
-  .grade-badge { display: inline-block; font-family: var(--font-head); font-size: 18px; padding: 2px 12px; border-radius: 3px; margin-bottom: 10px; }
-  .grade-A\+ { background: var(--green); color: #000; }
-  .grade-A  { background: #00cc6a; color: #000; }
-  .grade-B  { background: var(--cyan); color: #000; }
-  .grade-C  { background: #8888cc; color: #fff; }
-  .grade-PASS { background: #333; color: #888; }
+  .grade-badge { display: inline-block; font-family: var(--font-head); font-size: 14px; padding: 3px 10px; border-radius: 6px; }
+  .grade-Aplus { background: var(--lime); color: #000; }
+  .grade-A     { background: var(--green); color: #000; }
+  .grade-B     { background: var(--cyan); color: #000; }
+  .grade-C     { background: #7a7ab8; color: #fff; }
+  .grade-PASS  { background: #2a2a38; color: #888; }
 
-  .ai-intel { font-family: var(--font-data); font-size: 11px; color: var(--cyan); border-top: 1px solid var(--card-border); padding-top: 10px; margin-top: 10px; line-height: 1.7; }
-  .ai-intel .pick-label { color: var(--gold); font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px; }
+  .confidence { height: 4px; background: var(--bg3); border-radius: 4px; overflow: hidden; margin: 2px 0 10px; }
+  .confidence > span { display: block; height: 100%; background: linear-gradient(90deg, var(--violet), var(--lime)); }
 
-  #loader { text-align: center; padding: 50px; font-family: var(--font-data); color: var(--cyan); font-size: 13px; letter-spacing: 2px; line-height: 2; }
+  .ai-intel { font-size: 13px; color: var(--text); border-top: 1px solid var(--border); padding-top: 10px; margin-top: auto; line-height: 1.55; }
+  .ai-intel .pick-label { color: var(--lime); font-family: var(--font-data); font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px; }
+  .ai-intel .reason { color: #c4c4dc; }
+  .sources { margin-top: 8px; font-size: 10px; font-family: var(--font-data); color: var(--muted); overflow-wrap: anywhere; }
+  .sources a { color: var(--violet); text-decoration: none; }
+
+  #loader { text-align: center; padding: 50px 16px; font-family: var(--font-data); color: var(--violet); font-size: 13px; letter-spacing: 2px; line-height: 2; }
   .pulse { animation: pulse 1.2s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .empty, .error-box { text-align: center; grid-column: 1/-1; padding: 50px 16px; font-family: var(--font-data); font-size: 13px; line-height: 2; color: var(--muted); }
+  .error-box { color: var(--red); }
+  .error-box small { color: #ff8aa0; font-size: 11px; overflow-wrap: anywhere; }
 
-  .error-box { text-align: center; padding: 40px; font-family: var(--font-data); font-size: 13px; color: var(--red); line-height: 2; }
-  .last-sync { text-align: center; font-family: var(--font-data); font-size: 11px; color: #444; padding: 10px; }
+  .disclaimer { max-width: 1200px; margin: 0 auto; padding: 0 16px 30px; font-size: 11px; color: #55556e; text-align: center; line-height: 1.6; position: relative; z-index: 10; }
+
+  dialog { margin: auto; background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 14px; padding: 22px; width: min(440px, calc(100% - 32px)); }
+  dialog::backdrop { background: rgba(0,0,0,0.7); }
+  dialog h2 { font-family: var(--font-head); font-size: 20px; margin-bottom: 8px; }
+  dialog p { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+  dialog label { font-size: 11px; font-family: var(--font-data); color: var(--muted); display: block; margin: 10px 0 4px; text-transform: uppercase; }
+  dialog input, dialog select { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px; font-family: var(--font-data); font-size: 13px; }
+  .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+  .primary { background: var(--violet); color: #fff; border: none; border-radius: 8px; padding: 9px 16px; cursor: pointer; font-weight: 600; }
+
+  @media (max-width: 480px) {
+    .logo { font-size: 28px; }
+    .refresh-btn { flex: 1 1 100%; min-height: 48px; }
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo-text">COURTSIDE SKEPTIC</div>
+  <div class="brand-row">
+    <div>
+      <div class="logo">Veezy<span class="dot">.</span><span class="ai">ai</span></div>
+      <div class="tagline">AI-graded NBA edges · today's slate</div>
+    </div>
+    <button class="icon-btn" id="settings-btn" type="button">⚙ Settings</button>
+  </div>
   <div class="top-ui">
-    <div class="stat-box">
-      <span class="stat-label">GAMES:</span>
-      <span class="stat-val" id="stat-games">0</span>
-    </div>
-    <div class="stat-box">
-      <span class="stat-label">SOURCE:</span>
-      <span class="stat-val" id="stat-source" style="font-size:16px">--</span>
-    </div>
-    <button class="refresh-btn" id="refresh-btn" onclick="manualRefresh()">FORCE<br>REFRESH</button>
+    <div class="stat-box"><span class="stat-label">Games</span><span class="stat-val" id="stat-games">0</span></div>
+    <div class="stat-box"><span class="stat-label">A-tier plays</span><span class="stat-val" id="stat-locks">0</span></div>
+    <div class="stat-box"><span class="stat-label">Source</span><span class="stat-val" id="stat-source" style="font-size:16px">--</span></div>
+    <button class="refresh-btn" id="refresh-btn" type="button">REFRESH<br>SLATE</button>
+  </div>
+  <div class="filters" id="filters">
+    <button class="chip active" data-filter="ALL" type="button">All</button>
+    <button class="chip" data-filter="A" type="button">A+ / A</button>
+    <button class="chip" data-filter="B" type="button">B+</button>
+    <button class="chip" data-filter="NOPASS" type="button">Hide PASS</button>
   </div>
   <div class="last-sync" id="last-sync"></div>
 </header>
@@ -88,173 +135,295 @@
   <div id="games-container"></div>
 </main>
 
-<script>
-const CACHE_KEY  = 'cs_games_v2';
-const CACHE_TS   = 'cs_ts_v2';
-const CACHE_TTL  = 20 * 60 * 1000; // 20 min
+<p class="disclaimer">Veezy.ai is for entertainment and research. AI picks can be wrong and lines move — verify odds with your sportsbook. Bet responsibly; 21+ where legal. Problem gambling help: 1-800-GAMBLER.</p>
 
-// ─── AI fetch via Anthropic API + web search ────────────────────────────────
-async function fetchGamesFromAI() {
+<dialog id="settings">
+  <form method="dialog" id="settings-form">
+    <h2>Veezy.ai settings</h2>
+    <p>Veezy.ai calls the Claude API straight from your browser with your own Anthropic API key. The key is stored only in this browser's local storage.</p>
+    <label for="api-key">Anthropic API key</label>
+    <input id="api-key" type="password" autocomplete="off" placeholder="sk-ant-...">
+    <label for="effort">Analysis depth</label>
+    <select id="effort">
+      <option value="low">Fast (low effort)</option>
+      <option value="medium" selected>Balanced (medium effort)</option>
+      <option value="high">Deep (high effort)</option>
+    </select>
+    <div class="dialog-actions">
+      <button class="icon-btn" value="cancel" type="submit">Cancel</button>
+      <button class="primary" value="save" type="submit">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module">
+import Anthropic from 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.132.0/+esm';
+
+const MODEL        = 'claude-opus-5-5';
+const KEY_STORE    = 'veezy_api_key';
+const EFFORT_STORE = 'veezy_effort';
+const CACHE_KEY    = 'veezy_slate_v1';
+const CACHE_TTL    = 20 * 60 * 1000; // 20 min
+const MAX_CONTINUATIONS = 5;
+const GRADE_RANK   = { 'A+': 0, 'A': 1, 'B': 2, 'C': 3, 'PASS': 4 };
+
+let currentGames = [];
+let currentFilter = 'ALL';
+let loaded = false;
+
+// ─── Storage helpers (storage may be blocked in private windows) ───────────
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const todayKey = () => new Date().toLocaleDateString('en-CA');
+
+// ─── Odds math ──────────────────────────────────────────────────────────────
+function impliedProb(ml) {
+  const n = parseInt(String(ml).replace(/[^\d+-]/g, ''), 10);
+  if (!Number.isFinite(n) || n === 0) return null;
+  return n > 0 ? 100 / (n + 100) : -n / (-n + 100);
+}
+
+function marketMath(awayML, homeML) {
+  const a = impliedProb(awayML), h = impliedProb(homeML);
+  if (a == null || h == null) return null;
+  const overround = a + h;
+  return { awayFair: a / overround, homeFair: h / overround, vig: overround - 1 };
+}
+
+const pct = (p) => `${(p * 100).toFixed(1)}%`;
+
+// ─── AI fetch via Claude API + web search ──────────────────────────────────
+function buildPrompt() {
   const today = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+  return `Today is ${today}.
+Use web search to find the NBA games scheduled for TODAY only (not yesterday, not tomorrow), with current consensus sportsbook lines, injury news and recent form.
 
-  const prompt = `Today is ${today}. 
-Find the NBA games scheduled for TODAY only (not yesterday, not tomorrow).
-For each game return a JSON array. Each element must have exactly these fields:
+Return a JSON array. Each element must have exactly these fields:
 {
   "away_team": "Full team name",
-  "home_team": "Full team name", 
+  "home_team": "Full team name",
   "time_et": "HH:MM AM/PM ET",
   "away_ml": "+120",
   "home_ml": "-140",
   "spread": "Celtics -5.5",
   "total": "224.5",
   "pick": "OVER 224.5",
-  "pick_reason": "One short sentence why",
-  "grade": "A+" 
+  "pick_reason": "One or two short sentences citing the concrete edge (injury, pace, rest, matchup)",
+  "grade": "A+",
+  "confidence": 72,
+  "sources": ["https://..."]
 }
-Grades: A+ (diamond lock), A (strong), B (lean), C (slight edge), PASS (skip).
-Moneylines must include + or - sign. 
-If no NBA games today, return an empty array [].
-Return ONLY valid JSON array, no markdown, no explanation.`;
+Grades: A+ (strongest edge), A (strong), B (lean), C (slight edge), PASS (no edge, skip).
+Be a skeptic: most games should be B, C or PASS; reserve A+ for rare spots.
+confidence is an integer 0-100. Moneylines must include a + or - sign. sources lists up to 2 URLs you relied on.
+If there are no NBA games today, return [].
+Respond with ONLY the JSON array: no markdown, no commentary.`;
+}
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
+async function fetchGamesFromAI(apiKey, effort) {
+  const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
+  const userMsg = { role: 'user', content: buildPrompt() };
+  let messages = [userMsg];
+  let msg;
 
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`API ${res.status}: ${errText.slice(0, 120)}`);
+  // Web search runs a server-side loop; resume on pause_turn by resending the paused turn.
+  for (let i = 0; i <= MAX_CONTINUATIONS; i++) {
+    msg = await client.beta.messages.stream({
+      model: MODEL,
+      max_tokens: 16000,
+      betas: ['server-side-fallback-2026-07-01'],
+      fallbacks: 'default',
+      thinking: { type: 'adaptive' },
+      output_config: { effort },
+      tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 8 }],
+      messages,
+    }).finalMessage();
+
+    if (msg.stop_reason !== 'pause_turn') break;
+    messages = [userMsg, { role: 'assistant', content: msg.content }];
   }
 
-  const data = await res.json();
-  const text = data.content
-    .filter(b => b.type === 'text')
-    .map(b => b.text)
-    .join('');
+  if (msg.stop_reason === 'refusal') throw new Error('The model declined this request.');
+  if (msg.stop_reason === 'pause_turn') throw new Error('Search ran too long — try again.');
+  if (msg.stop_reason === 'max_tokens') throw new Error('Response was cut off — try a lower analysis depth.');
 
-  // Strip any accidental markdown fences
+  const text = msg.content.filter(b => b.type === 'text').map(b => b.text).join('');
   const clean = text.replace(/```json|```/gi, '').trim();
-
-  // Extract JSON array robustly
   const match = clean.match(/\[[\s\S]*\]/);
   if (!match) throw new Error('No JSON array in AI response');
-  return JSON.parse(match[0]);
+  const games = JSON.parse(match[0]);
+  if (!Array.isArray(games)) throw new Error('AI response was not a list of games');
+  return games;
 }
 
 // ─── Render ─────────────────────────────────────────────────────────────────
-function render(games) {
-  const container = document.getElementById('games-container');
-  document.getElementById('stat-games').textContent = games.length;
+function normGrade(g) {
+  const s = String(g || '').toUpperCase().replace(/\s/g, '');
+  return s in GRADE_RANK ? s : 'PASS';
+}
 
-  if (!games || games.length === 0) {
-    container.innerHTML = `<div style="text-align:center;grid-column:1/-1;color:#6b6b9a;padding:50px;font-family:var(--font-data);font-size:13px;">
-      NO NBA GAMES SCHEDULED TODAY<br><span style="opacity:0.4;font-size:11px">Check back on a game day</span>
-    </div>`;
+function passesFilter(g) {
+  const r = GRADE_RANK[normGrade(g.grade)];
+  if (currentFilter === 'A') return r <= 1;
+  if (currentFilter === 'B') return r <= 2;
+  if (currentFilter === 'NOPASS') return r < 4;
+  return true;
+}
+
+function safeUrl(u) {
+  try { const url = new URL(u); return /^https?:$/.test(url.protocol) ? url : null; } catch { return null; }
+}
+
+function oddsChip(label, val, sub) {
+  const v = val || '---';
+  const cls = /^\+/.test(v) ? 'pos' : /^-\d/.test(v) ? 'neg' : '';
+  return `<div class="odds-chip"><span class="label">${label}</span><span class="val ${cls}">${esc(v)}</span>${sub ? `<span class="sub">${sub}</span>` : ''}</div>`;
+}
+
+function render() {
+  loaded = true;
+  const container = document.getElementById('games-container');
+  const games = currentGames;
+  document.getElementById('stat-games').textContent = games.length;
+  document.getElementById('stat-locks').textContent = games.filter(g => GRADE_RANK[normGrade(g.grade)] <= 1).length;
+
+  if (games.length === 0) {
+    container.innerHTML = `<div class="empty">NO NBA GAMES SCHEDULED TODAY<br><span style="opacity:0.6;font-size:11px">Check back on a game day</span></div>`;
     return;
   }
 
-  container.innerHTML = games.map(g => {
-    const gradeClass = (g.grade || 'PASS').replace(/[^A-Z+]/g, '');
-    const awayML = g.away_ml || '---';
-    const homeML = g.home_ml || '---';
-    const awayClass = awayML.startsWith('+') ? 'pos' : 'neg';
-    const homeClass = homeML.startsWith('+') ? 'pos' : 'neg';
+  const shown = games
+    .filter(passesFilter)
+    .sort((a, b) => GRADE_RANK[normGrade(a.grade)] - GRADE_RANK[normGrade(b.grade)] || (b.confidence || 0) - (a.confidence || 0));
+
+  if (shown.length === 0) {
+    container.innerHTML = `<div class="empty">No games match this filter.</div>`;
+    return;
+  }
+
+  container.innerHTML = shown.map(g => {
+    const grade = normGrade(g.grade);
+    const gradeClass = grade === 'A+' ? 'Aplus' : grade;
+    const m = marketMath(g.away_ml, g.home_ml);
+    const conf = Math.max(0, Math.min(100, Number(g.confidence) || 0));
+    const links = (Array.isArray(g.sources) ? g.sources : []).map(safeUrl).filter(Boolean).slice(0, 2);
 
     return `
-    <div class="game-card">
+    <div class="game-card ${grade === 'A+' ? 'top' : ''}">
+      <div class="card-head">
+        <span class="grade-badge grade-${gradeClass}">${grade}</span>
+        <span class="tip">${esc(g.time_et || '')}</span>
+      </div>
       <div class="matchup">
-        <span class="team-name away">${g.away_team || '?'}</span>
-        <span style="color:var(--gold);font-size:16px">@</span>
-        <span class="team-name home">${g.home_team || '?'}</span>
+        <span class="team-name">${esc(g.away_team || '?')}</span>
+        <span class="at">@</span>
+        <span class="team-name home">${esc(g.home_team || '?')}</span>
       </div>
-
       <div class="odds-row">
-        <div class="odds-chip">
-          <span class="label">Away ML</span>
-          <span class="val ${awayClass}">${awayML}</span>
-        </div>
-        <div class="odds-chip">
-          <span class="label">Spread</span>
-          <span class="val">${g.spread || '---'}</span>
-        </div>
-        <div class="odds-chip">
-          <span class="label">Total</span>
-          <span class="val">${g.total || '---'}</span>
-        </div>
-        <div class="odds-chip">
-          <span class="label">Home ML</span>
-          <span class="val ${homeClass}">${homeML}</span>
-        </div>
+        ${oddsChip('Away ML', g.away_ml, m && pct(m.awayFair))}
+        ${oddsChip('Spread', g.spread)}
+        ${oddsChip('Total', g.total)}
+        ${oddsChip('Home ML', g.home_ml, m && pct(m.homeFair))}
       </div>
-
-      <span class="grade-badge grade-${g.grade || 'PASS'}">${g.grade || 'PASS'}</span>
-
+      ${m ? `<div class="market-note">No-vig win prob shown under ML · book hold ${pct(m.vig)}</div>` : ''}
+      ${conf ? `<div class="confidence" title="AI confidence ${conf}%"><span style="width:${conf}%"></span></div>` : ''}
       <div class="ai-intel">
-        <span class="pick-label">▶ ${g.pick || 'NO PICK'} ${g.time_et ? '· ' + g.time_et : ''}</span>
-        ${g.pick_reason || 'AI analysis unavailable'}
+        <span class="pick-label">▶ ${esc(g.pick || 'NO PICK')}${conf ? ` · ${conf}%` : ''}</span>
+        <span class="reason">${esc(g.pick_reason || 'AI analysis unavailable')}</span>
+        ${links.length ? `<div class="sources">Sources: ${links.map(u => `<a href="${esc(u.href)}" target="_blank" rel="noopener noreferrer">${esc(u.hostname)}</a>`).join(' · ')}</div>` : ''}
       </div>
     </div>`;
   }).join('');
 }
 
 // ─── Load orchestration ─────────────────────────────────────────────────────
-async function loadData(force = false) {
-  const container  = document.getElementById('games-container');
-  const loader     = document.getElementById('loader');
-  const btn        = document.getElementById('refresh-btn');
-  const syncLabel  = document.getElementById('last-sync');
+function showError(title, detail) {
+  document.getElementById('games-container').innerHTML =
+    `<div class="error-box">${esc(title)}<br><small>${esc(detail)}</small></div>`;
+}
 
-  // Serve cache if fresh
+async function loadData(force = false) {
+  const loader    = document.getElementById('loader');
+  const btn       = document.getElementById('refresh-btn');
+  const syncLabel = document.getElementById('last-sync');
+  const source    = document.getElementById('stat-source');
+
+  // Serve today's cache if fresh
   if (!force) {
-    const cached = localStorage.getItem(CACHE_KEY);
-    const ts     = localStorage.getItem(CACHE_TS);
-    if (cached && ts && (Date.now() - Number(ts) < CACHE_TTL)) {
-      document.getElementById('stat-source').textContent = 'CACHED';
-      syncLabel.textContent = `Last sync: ${new Date(Number(ts)).toLocaleTimeString()}`;
-      render(JSON.parse(cached));
-      return;
-    }
+    try {
+      const cached = JSON.parse(store.get(CACHE_KEY) || 'null');
+      if (cached && cached.day === todayKey() && Date.now() - cached.ts < CACHE_TTL) {
+        source.textContent = 'CACHED';
+        syncLabel.textContent = `Last sync: ${new Date(cached.ts).toLocaleTimeString()}`;
+        currentGames = cached.games;
+        render();
+        return;
+      }
+    } catch {}
   }
 
-  // Show loader
+  const apiKey = store.get(KEY_STORE);
+  if (!apiKey) {
+    source.textContent = 'NO KEY';
+    showError('ADD YOUR ANTHROPIC API KEY', 'Open ⚙ Settings to connect Veezy.ai to Claude.');
+    return;
+  }
+
   loader.style.display = 'block';
-  loader.innerHTML = `<span class="pulse">⬡ QUERYING AI INTEL FEED...</span>`;
-  container.innerHTML = '';
+  loader.innerHTML = `<span class="pulse">◆ VEEZY IS SCOUTING TODAY'S SLATE...</span><br><span style="font-size:11px;color:var(--muted)">Searching lines, injuries & form — this can take a minute</span>`;
+  document.getElementById('games-container').innerHTML = '';
   btn.disabled = true;
 
   try {
-    const games = await fetchGamesFromAI();
-
-    localStorage.setItem(CACHE_KEY, JSON.stringify(games));
-    localStorage.setItem(CACHE_TS, Date.now().toString());
-
-    document.getElementById('stat-source').textContent = 'AI LIVE';
-    syncLabel.textContent = `Last sync: ${new Date().toLocaleTimeString()}`;
-    render(games);
+    const games = await fetchGamesFromAI(apiKey, store.get(EFFORT_STORE) || 'medium');
+    const ts = Date.now();
+    store.set(CACHE_KEY, JSON.stringify({ day: todayKey(), ts, games }));
+    source.textContent = 'AI LIVE';
+    syncLabel.textContent = `Last sync: ${new Date(ts).toLocaleTimeString()}`;
+    currentGames = games;
+    render();
   } catch (err) {
-    loader.innerHTML = '';
-    container.innerHTML = `<div class="error-box" style="grid-column:1/-1">
-      DATA SYNC FAILED<br>
-      <span style="color:#ff6688;font-size:11px">${err.message}</span><br><br>
-      <span style="color:#444;font-size:10px">Check console for details</span>
-    </div>`;
-    console.error('[Courtside Skeptic]', err);
+    let detail = err.message;
+    if (err instanceof Anthropic.AuthenticationError) detail = 'Invalid API key — update it in Settings.';
+    else if (err instanceof Anthropic.RateLimitError) detail = 'Rate limited — wait a moment and refresh.';
+    else if (err instanceof Anthropic.APIConnectionError) detail = 'Could not reach the Claude API — check your connection.';
+    source.textContent = 'ERROR';
+    showError('DATA SYNC FAILED', detail);
+    console.error('[Veezy.ai]', err);
   } finally {
     loader.style.display = 'none';
     btn.disabled = false;
   }
 }
 
-function manualRefresh() {
-  loadData(true);
-}
+// ─── Wiring ─────────────────────────────────────────────────────────────────
+const dialog = document.getElementById('settings');
+document.getElementById('settings-btn').addEventListener('click', () => {
+  document.getElementById('api-key').value = store.get(KEY_STORE) || '';
+  document.getElementById('effort').value = store.get(EFFORT_STORE) || 'medium';
+  dialog.showModal();
+});
+dialog.addEventListener('close', () => {
+  if (dialog.returnValue !== 'save') return;
+  const key = document.getElementById('api-key').value.trim();
+  store.set(KEY_STORE, key);
+  store.set(EFFORT_STORE, document.getElementById('effort').value);
+  if (key) loadData(true);
+});
+
+document.getElementById('refresh-btn').addEventListener('click', () => loadData(true));
+
+document.getElementById('filters').addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  currentFilter = chip.dataset.filter;
+  document.querySelectorAll('#filters .chip').forEach(c => c.classList.toggle('active', c === chip));
+  if (loaded) render();
+});
 
 loadData();
 </script>
