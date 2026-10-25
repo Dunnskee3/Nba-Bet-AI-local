@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Veezy.ai — AI NBA Edge</title>
-<meta name="description" content="Veezy.ai: AI-graded NBA lines, picks and edges for today's slate.">
+<title>Courtside Skeptic — AI NBA Edge</title>
+<meta name="description" content="Courtside Skeptic: AI-graded NBA lines, picks and edges for today's slate.">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Archivo+Black&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -110,7 +110,7 @@
 <header>
   <div class="brand-row">
     <div>
-      <div class="logo">Veezy<span class="dot">.</span><span class="ai">ai</span></div>
+      <div class="logo">Courtside <span class="ai">Skeptic</span></div>
       <div class="tagline">AI-graded NBA edges · today's slate</div>
     </div>
     <button class="icon-btn" id="settings-btn" type="button">⚙ Settings</button>
@@ -135,12 +135,12 @@
   <div id="games-container"></div>
 </main>
 
-<p class="disclaimer">Veezy.ai is for entertainment and research. AI picks can be wrong and lines move — verify odds with your sportsbook. Bet responsibly; 21+ where legal. Problem gambling help: 1-800-GAMBLER.</p>
+<p class="disclaimer">Courtside Skeptic is for entertainment and research. AI picks can be wrong and lines move — verify odds with your sportsbook. Bet responsibly; 21+ where legal. Problem gambling help: 1-800-GAMBLER.</p>
 
 <dialog id="settings">
   <form method="dialog" id="settings-form">
-    <h2>Veezy.ai settings</h2>
-    <p>Veezy.ai calls the Claude API straight from your browser with your own Anthropic API key. The key is stored only in this browser's local storage.</p>
+    <h2>Courtside Skeptic settings</h2>
+    <p>Courtside Skeptic calls the Claude API straight from your browser with your own Anthropic API key. The key is stored only in this browser's local storage.</p>
     <label for="api-key">Anthropic API key</label>
     <input id="api-key" type="password" autocomplete="off" placeholder="sk-ant-...">
     <label for="effort">Analysis depth</label>
@@ -160,9 +160,9 @@
 import Anthropic from 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.132.0/+esm';
 
 const MODEL        = 'claude-opus-5-5';
-const KEY_STORE    = 'veezy_api_key';
-const EFFORT_STORE = 'veezy_effort';
-const CACHE_KEY    = 'veezy_slate_v1';
+const KEY_STORE    = 'cs_api_key';
+const EFFORT_STORE = 'cs_effort';
+const CACHE_KEY    = 'cs_slate_v3';
 const CACHE_TTL    = 20 * 60 * 1000; // 20 min
 const MAX_CONTINUATIONS = 5;
 const GRADE_RANK   = { 'A+': 0, 'A': 1, 'B': 2, 'C': 3, 'PASS': 4 };
@@ -369,12 +369,12 @@ async function loadData(force = false) {
   const apiKey = store.get(KEY_STORE);
   if (!apiKey) {
     source.textContent = 'NO KEY';
-    showError('ADD YOUR ANTHROPIC API KEY', 'Open ⚙ Settings to connect Veezy.ai to Claude.');
+    showError('ADD YOUR ANTHROPIC API KEY', 'Open ⚙ Settings to connect Courtside Skeptic to Claude.');
     return;
   }
 
   loader.style.display = 'block';
-  loader.innerHTML = `<span class="pulse">◆ VEEZY IS SCOUTING TODAY'S SLATE...</span><br><span style="font-size:11px;color:var(--muted)">Searching lines, injuries & form — this can take a minute</span>`;
+  loader.innerHTML = `<span class="pulse">◆ SCOUTING TODAY'S SLATE...</span><br><span style="font-size:11px;color:var(--muted)">Searching lines, injuries & form — this can take a minute</span>`;
   document.getElementById('games-container').innerHTML = '';
   btn.disabled = true;
 
@@ -393,7 +393,7 @@ async function loadData(force = false) {
     else if (err instanceof Anthropic.APIConnectionError) detail = 'Could not reach the Claude API — check your connection.';
     source.textContent = 'ERROR';
     showError('DATA SYNC FAILED', detail);
-    console.error('[Veezy.ai]', err);
+    console.error('[Courtside Skeptic]', err);
   } finally {
     loader.style.display = 'none';
     btn.disabled = false;

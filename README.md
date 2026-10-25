@@ -1,8 +1,8 @@
-# Veezy.ai
+# Courtside Skeptic
 
 AI-graded NBA lines, picks and edges for today's slate: one static `index.html`, no build step.
 
-Veezy.ai is a rebuild of the earlier **Courtside Skeptic v3.5** page, which is still in git history.
+This is an upgraded version of **Courtside Skeptic v3.5**. The original is still in git history.
 
 ## How the original worked
 
@@ -22,9 +22,9 @@ Problems found:
 - **Stale cache:** the cache wasn't tied to the date, so yesterday's slate could show after midnight.
 - **Outdated model and tool:** it used an old model and an old web search tool version.
 
-## What Veezy.ai changes
+## What the upgrade changes
 
-- **New look:** the Veezy.ai brand, and the layout works on phones.
+- **New look:** a refreshed design, and the layout works on phones.
 - **Your own API key:** you enter an Anthropic key in ⚙ Settings. It is stored only in your browser. Calls go through the official `@anthropic-ai/sdk`, loaded as an ES module from jsDelivr.
 - **Current model:** `claude-opus-5-5` with adaptive thinking, an adjustable effort level, `web_search_20260209`, streaming, and resume on `pause_turn`.
 - **Refusal fallback:** if the main model declines, another model runs the request automatically (server-side `fallbacks: "default"`).
